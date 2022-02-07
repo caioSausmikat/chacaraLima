@@ -226,6 +226,21 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
+  pedidosData: {
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginLeft: 5,
+    marginRight: 5,
+    justifyContent: "center",
+    padding: 10,
+    maxHeight: "90%",
+  },
+  dropdownPickerPedidosStyle: {
+    marginBottom: 5,
+    borderColor: "green",
+    width: "55%",
+  },
 });
 
 export { styles };

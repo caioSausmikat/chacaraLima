@@ -6,6 +6,7 @@ import {
   Keyboard,
   Alert,
   Text,
+  Platform,
 } from "react-native";
 import { styles } from "../../../assets/styles/styles";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -13,7 +14,9 @@ import config from "../../../config/config.json";
 import { FlatList } from "native-base";
 import PedidosItemScreen from "./PedidosItemScreen";
 import capitalize from "../../../functions/capitalize";
-import DatePicker from 'react-native-date-picker'
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
+import dataBr from "../../../functions/dataBr";
 
 interface RestauranteDropdownList {
   label: string;
@@ -62,13 +65,24 @@ export default function PedidosScreen(props: any) {
     ProdutoRestaurante[]
   >([]);
 
-  const [dataPedido, setDataPedido] = useState(new Date());
+  const [dataPedido, setDataPedido] = useState(
+    new Date().toJSON().slice(0, 10)
+  );
 
   const [pedido, setPedido] = useState<Pedido[]>([]);
+
+  const [date, setDate] = useState(new Date());
+  const [mode, setMode] = useState("date");
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     buscarDadosIniciais();
   }, []);
+
+  useEffect(() => {
+    setShow(false);
+    atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+  }, [dataPedido]);
 
   async function buscarDadosIniciais() {
     try {
@@ -150,7 +164,7 @@ export default function PedidosScreen(props: any) {
       },
       body: JSON.stringify({
         codigoRestaurante: restauranteId,
-        dataPedido: dataPedido.toJSON().slice(0, 10),
+        dataPedido: dataPedido,
       }),
     });
   }
@@ -161,7 +175,7 @@ export default function PedidosScreen(props: any) {
 
     for (const item of json[0]) {
       listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}`,
+        key: `${item.restauranteId}${item.produtoId}${new Date()}`,
         produtoId: item.produtoId,
         restauranteId: item.restauranteId,
         nome: capitalize(item.nome),
@@ -170,7 +184,7 @@ export default function PedidosScreen(props: any) {
       });
 
       pedido.push({
-        dataPedido: dataPedido.toJSON().slice(0, 10),
+        dataPedido: dataPedido,
         restauranteId: item.restauranteId,
         usuarioId: props.route.params.usuarioLogado.id,
         nomeUsuario: props.route.params.usuarioLogado.nome,
@@ -229,15 +243,41 @@ export default function PedidosScreen(props: any) {
     }
   }
 
+  const onChangeDate = (event: Event, selectedDate: Date) => {
+    if (selectedDate) {
+      setShow(false);
+      // if (event.type === "set") {
+      //   setShow(Platform.OS === "ios");
+      // }
+      setDataPedido(selectedDate.toJSON().slice(0, 10));
+      setDate(selectedDate);
+    }
+  };
+
+  const onPressDateHandler = () => {
+    setShow(true);
+  };
+
   return (
     <View style={styles.container}>
-      <DatePicker date={dataPedido} onDateChange={setDataPedido} />
       {mostrarListaRestaurantes == true && (
-        <View style={styles.dropdownPickerRestauranteContainer}>
+        <View style={{ flexDirection: "row", marginTop: 40 }}>
+          <TouchableOpacity onPress={onPressDateHandler}>
+            <Ionicons
+              style={{ color: "#418ac7", marginLeft: 20 }}
+              name="calendar"
+              size={40}
+              title="Show date picker!"
+            />
+          </TouchableOpacity>
+          <View style={styles.pedidosData}>
+            <Text>{dataBr(dataPedido)}</Text>
+          </View>
+
           <DropDownPicker
             zIndex={3000}
             zIndexInverse={3000}
-            style={[styles.dropdownPickerRestauranteStyle, { width: "50%" }]}
+            style={styles.dropdownPickerPedidosStyle}
             open={openDropDownRestaurantes}
             value={codigoRestauranteSelecionado}
             items={listaRestaurantes}
@@ -246,6 +286,7 @@ export default function PedidosScreen(props: any) {
             placeholder="Selecione o restaurante"
             dropDownContainerStyle={{
               borderColor: "green",
+              width: "55%",
             }}
             onChangeValue={() => {
               atualizaProdutosRestaurante(codigoRestauranteSelecionado);
@@ -253,6 +294,17 @@ export default function PedidosScreen(props: any) {
           />
         </View>
       )}
+      <View>
+        {show == true && (
+          <DateTimePicker
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            value={date}
+            onChange={onChangeDate}
+            maximumDate={new Date()}
+          />
+        )}
+      </View>
+
       <ScrollView contentContainerStyle={{ width: "92%", alignSelf: "center" }}>
         <FlatList
           data={listaProdutosRestaurante}
@@ -265,9 +317,28 @@ export default function PedidosScreen(props: any) {
           )}
         />
       </ScrollView>
-      <View>
+      <View style={{ flexDirection: "row", justifyContent: "center" }}>
         <TouchableOpacity
-          style={[styles.confirmaRedefinicaoSenhaContainer, { width: "40%" }]}
+          style={[
+            styles.confirmaRedefinicaoSenhaContainer,
+            {
+              width: "30%",
+              marginBottom: 10,
+              marginRight: 5,
+              backgroundColor: "#4b9666",
+            },
+          ]}
+          onPress={() => {
+            atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+          }}
+        >
+          <Text style={styles.confirmaRedefinicaoSenhaText}>Buscar Pedido</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.confirmaRedefinicaoSenhaContainer,
+            { width: "30%", marginBottom: 10 },
+          ]}
           onPress={() => {
             salvarPedido();
           }}

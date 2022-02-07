@@ -15,7 +15,7 @@ export default function PedidosItemScreen(props: any) {
 
   return (
     <View style={styles.listaProdutosRestauranteContainer}>
-      <View style={[styles.produtosRestauranteContainer, { width: "55%" }]}>
+      <View style={[styles.produtosRestauranteContainer, { width: "60%" }]}>
         <Text>{props.itemProduto.nome}</Text>
       </View>
       <View
@@ -30,7 +30,6 @@ export default function PedidosItemScreen(props: any) {
             setValorProdutoAnterior(quantidadeProduto);
             setQuantidadeProduto("");
           }}
-          placeholder="Qtd"
           value={quantidadeProduto}
           maxLength={4}
           keyboardType="number-pad"
