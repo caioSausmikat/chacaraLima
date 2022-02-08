@@ -72,7 +72,6 @@ export default function PedidosScreen(props: any) {
   const [pedido, setPedido] = useState<Pedido[]>([]);
 
   const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -80,7 +79,6 @@ export default function PedidosScreen(props: any) {
   }, []);
 
   useEffect(() => {
-    setShow(false);
     atualizaProdutosRestaurante(codigoRestauranteSelecionado);
   }, [dataPedido]);
 
@@ -244,18 +242,16 @@ export default function PedidosScreen(props: any) {
   }
 
   const onChangeDate = (event: Event, selectedDate: Date) => {
+    setShow(Platform.OS === "ios");
+
     if (selectedDate) {
-      setShow(false);
-      // if (event.type === "set") {
-      //   setShow(Platform.OS === "ios");
-      // }
       setDataPedido(selectedDate.toJSON().slice(0, 10));
-      setDate(selectedDate);
+      setDate(selectedDate || date);
     }
   };
 
   const onPressDateHandler = () => {
-    setShow(true);
+    setShow(!show);
   };
 
   return (
@@ -274,32 +270,35 @@ export default function PedidosScreen(props: any) {
             <Text>{dataBr(dataPedido)}</Text>
           </View>
 
-          <DropDownPicker
-            zIndex={3000}
-            zIndexInverse={3000}
-            style={styles.dropdownPickerPedidosStyle}
-            open={openDropDownRestaurantes}
-            value={codigoRestauranteSelecionado}
-            items={listaRestaurantes}
-            setOpen={setOpenDropDownRestaurantes}
-            setValue={setCodigoRestauranteSelecionado}
-            placeholder="Selecione o restaurante"
-            dropDownContainerStyle={{
-              borderColor: "green",
-              width: "55%",
-            }}
-            onChangeValue={() => {
-              atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-            }}
-          />
+          <View>
+            <DropDownPicker
+              zIndex={3000}
+              zIndexInverse={3000}
+              style={styles.dropdownPickerPedidosStyle}
+              open={openDropDownRestaurantes}
+              value={codigoRestauranteSelecionado}
+              items={listaRestaurantes}
+              setOpen={setOpenDropDownRestaurantes}
+              setValue={setCodigoRestauranteSelecionado}
+              placeholder="Selecione o restaurante"
+              dropDownContainerStyle={{
+                borderColor: "green",
+                width: "55%",
+              }}
+              onChangeValue={() => {
+                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+              }}
+            />
+          </View>
         </View>
       )}
       <View>
         {show == true && (
           <DateTimePicker
-            display={Platform.OS === "ios" ? "spinner" : "default"}
+            display="default"
             value={date}
             onChange={onChangeDate}
+            textColor="#418ac7"
             maximumDate={new Date()}
           />
         )}
