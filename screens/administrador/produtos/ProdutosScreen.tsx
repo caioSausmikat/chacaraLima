@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   Keyboard,
   Alert,
-  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { RootTabScreenProps } from "../../../types";
 import { styles } from "../../../assets/styles/styles";
@@ -15,6 +14,7 @@ import { FlatList } from "native-base";
 import ProdutosItemScreen from "./ProdutosItemScreen";
 import { Ionicons } from "@expo/vector-icons";
 import capitalize from "../../../functions/capitalize";
+import { color } from "native-base/lib/typescript/theme/styled-system";
 
 interface Produto {
   produtoId: number;
@@ -133,22 +133,24 @@ export default function ProdutosScreen({
   }
 
   async function incluiProdutoHandler(nome: string) {
-    let response = await fetch(config.urlRoot + "incluirProduto", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nome: nome.toUpperCase(),
-      }),
-    });
-    let incluidoSucesso = await response.json();
-    if (incluidoSucesso) {
-      Alert.alert("Produto incluído com sucesso!");
-      buscarDadosBase();
-      Keyboard.dismiss();
-      setNomeProduto("");
+    if (nome != "") {
+      let response = await fetch(config.urlRoot + "incluirProduto", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: nome.toUpperCase(),
+        }),
+      });
+      let incluidoSucesso = await response.json();
+      if (incluidoSucesso) {
+        Alert.alert("Produto incluído com sucesso!");
+        buscarDadosBase();
+        Keyboard.dismiss();
+        setNomeProduto("");
+      }
     }
   }
 
@@ -158,21 +160,20 @@ export default function ProdutosScreen({
 
   return (
     <View style={styles.container}>
+      <View style={{ marginTop: 40 }}></View>
       {mostrarProdutos == true && (
-        <ScrollView style={styles.listaProdutosContainer}>
-          <FlatList
-            data={listaProdutos}
-            keyExtractor={(item) => item.produtoId.toString()}
-            extraData={atualizaFlatList}
-            renderItem={(itemData) => (
-              <ProdutosItemScreen
-                itemProduto={itemData.item}
-                onDelete={excluirProdutoConfirmacao}
-                onUpdate={alterarProdutoHandler}
-              />
-            )}
-          />
-        </ScrollView>
+        <FlatList
+          data={listaProdutos}
+          keyExtractor={(item) => item.produtoId.toString()}
+          extraData={atualizaFlatList}
+          renderItem={(itemData) => (
+            <ProdutosItemScreen
+              itemProduto={itemData.item}
+              onDelete={excluirProdutoConfirmacao}
+              onUpdate={alterarProdutoHandler}
+            />
+          )}
+        />
       )}
       <View style={[styles.incluirProdutoContainer]}>
         <View style={styles.adicionarProdutoContainer}>
@@ -180,6 +181,7 @@ export default function ProdutosScreen({
             value={nomeProduto}
             placeholder="Adicionar produto"
             onChangeText={nomeInputHandler}
+            placeholderTextColor="gray"
           />
         </View>
 

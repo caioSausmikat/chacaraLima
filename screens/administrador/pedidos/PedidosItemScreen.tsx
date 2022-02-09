@@ -14,7 +14,12 @@ export default function PedidosItemScreen(props: any) {
   };
 
   return (
-    <View style={styles.listaProdutosRestauranteContainer}>
+    <View
+      style={[
+        styles.listaProdutosRestauranteContainer,
+        { width: "92%", alignSelf: "center" },
+      ]}
+    >
       <View style={[styles.produtosRestauranteContainer, { width: "60%" }]}>
         <Text>{props.itemProduto.nome}</Text>
       </View>
@@ -48,7 +53,7 @@ export default function PedidosItemScreen(props: any) {
           )}
         />
       </View>
-      <View style={styles.produtosValorContainer}>
+      <View style={[styles.produtosValorContainer, { borderColor: "gray" }]}>
         <Text>R$ {valorProduto}</Text>
       </View>
     </View>

@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as LocalAuthentication from "expo-local-authentication";
-import { RootStackScreenProps } from "../../types";
+import React, { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import {
   Input,
@@ -16,15 +13,12 @@ import {
 import {
   View,
   KeyboardAvoidingView,
-  Image,
   Platform,
   Text,
-  TouchableOpacity,
   Alert,
 } from "react-native";
 import { styles } from "../../assets/styles/styles";
 import config from "../../config/config.json";
-import Navigation from "../../navigation";
 
 export default function RedefinirSenhaScreen(props: any) {
   const [mostrarErroUsuarioSenha, setMostrarErroUsuarioSenha] = useState(false);
@@ -72,16 +66,23 @@ export default function RedefinirSenhaScreen(props: any) {
     setMostrarMensagemAguardarAprovacao(false);
     setMostrarButtonSolicitarRedefinicaoSenha(false);
     if (json) {
-      switch (json.indicadorAlteracaoSenha) {
-        case 0:
-          setMostrarButtonSolicitarRedefinicaoSenha(true);
-          break;
-        case 1:
-          setMostrarMensagemAguardarAprovacao(true);
-          break;
-        case 2:
-          setMostrarInputSenha(true);
-          break;
+      if (json.senha == null) {
+        Alert.alert(
+          "Senha não cadastrada, favor entrar sem preencher senha para cadastrar!"
+        );
+        props.navigation.navigate("Login");
+      } else {
+        switch (json.indicadorAlteracaoSenha) {
+          case 0:
+            setMostrarButtonSolicitarRedefinicaoSenha(true);
+            break;
+          case 1:
+            setMostrarMensagemAguardarAprovacao(true);
+            break;
+          case 2:
+            setMostrarInputSenha(true);
+            break;
+        }
       }
     } else {
       Alert.alert("Usuário não existe!");
@@ -118,7 +119,7 @@ export default function RedefinirSenhaScreen(props: any) {
   async function redefinirSenha() {
     setMostrarErroUsuarioSenha(false);
     if (senhaNova === senhaNovaConfirmacao) {
-      const response = await fetch(config.urlRoot + "redefinirSenha", {
+      const response = await fetch(config.urlRoot + "criarSenha", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -143,6 +144,9 @@ export default function RedefinirSenhaScreen(props: any) {
       }
     } else {
       setMostrarErroUsuarioSenha(true);
+      setTimeout(() => {
+        setMostrarErroUsuarioSenha(false);
+      }, 5000);
     }
   }
 

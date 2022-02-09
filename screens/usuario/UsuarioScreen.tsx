@@ -7,15 +7,15 @@ import {
   Text,
   Platform,
 } from "react-native";
-import { styles } from "../../../assets/styles/styles";
+import { styles } from "../../assets/styles/styles";
 import DropDownPicker from "react-native-dropdown-picker";
-import config from "../../../config/config.json";
+import config from "../../config/config.json";
 import { FlatList } from "native-base";
-import PedidosItemScreen from "./PedidosItemScreen";
-import capitalize from "../../../functions/capitalize";
+import UsuarioItemScreen from "./UsuarioItemScreen";
+import capitalize from "../../functions/capitalize";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
-import dataBr from "../../../functions/dataBr";
+import dataBr from "../../functions/dataBr";
 
 interface RestauranteDropdownList {
   label: string;
@@ -41,7 +41,7 @@ interface Pedido {
   valorProduto: number;
 }
 
-export default function PedidosScreen(props: any) {
+export default function UsuarioScreen(props: any) {
   const [openDropDownRestaurantes, setOpenDropDownRestaurantes] =
     useState(false);
 
@@ -291,7 +291,7 @@ export default function PedidosScreen(props: any) {
 
           <DropDownPicker
             zIndex={3000}
-            style={styles.dropdownPickerPedidosStyle}
+            style={[styles.dropdownPickerPedidosStyle, { width: "50%" }]}
             open={openDropDownRestaurantes}
             value={codigoRestauranteSelecionado}
             items={listaRestaurantes}
@@ -300,7 +300,7 @@ export default function PedidosScreen(props: any) {
             placeholder="Selecione o restaurante"
             dropDownContainerStyle={{
               borderColor: "green",
-              width: "55%",
+              width: "50%",
             }}
             onChangeValue={() => {
               atualizaProdutosRestaurante(codigoRestauranteSelecionado);
@@ -326,7 +326,8 @@ export default function PedidosScreen(props: any) {
           extraData={atualizaFlatList}
           removeClippedSubviews={false}
           renderItem={(itemData) => (
-            <PedidosItemScreen
+            <UsuarioItemScreen
+              dataPedido={dataPedido}
               itemProduto={itemData.item}
               onUpdate={atualizaListaProdutosRestaurante}
             />
@@ -342,7 +343,7 @@ export default function PedidosScreen(props: any) {
         </View>
       )}
 
-      {showButtons == true && (
+      {showButtons == true && dataPedido === new Date().toJSON().slice(0, 10) && (
         <View
           style={{
             flexDirection: "row",
@@ -350,18 +351,16 @@ export default function PedidosScreen(props: any) {
             height: "15%",
           }}
         >
-          {dataPedido === new Date().toJSON().slice(0, 10) && (
-            <TouchableOpacity
-              style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}
-              onPress={() => {
-                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-              }}
-            >
-              <Text style={styles.confirmaRedefinicaoSenhaText}>
-                Buscar Pedido
-              </Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}
+            onPress={() => {
+              atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+            }}
+          >
+            <Text style={styles.confirmaRedefinicaoSenhaText}>
+              Buscar Pedido
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.buscaPedidoButton}
             onPress={() => {

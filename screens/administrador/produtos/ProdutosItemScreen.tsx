@@ -34,7 +34,7 @@ export default function ProdutosItemScreen(props: any) {
           nomeProduto
         )}
       >
-        <MaterialCommunityIcons name="delete" size={20} color="gray" />
+        <MaterialCommunityIcons name="delete" size={25} color="gray" />
       </TouchableOpacity>
     </View>
   );

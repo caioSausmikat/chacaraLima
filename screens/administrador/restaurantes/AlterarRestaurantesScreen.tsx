@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   Keyboard,
@@ -136,22 +135,24 @@ export default function AlterarRestaurantesScreen({
   }
 
   async function incluiRestauranteHandler(nome: string) {
-    let response = await fetch(config.urlRoot + "incluirRestaurante", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nome: nome.toUpperCase(),
-      }),
-    });
-    let incluidoSucesso = await response.json();
-    if (incluidoSucesso) {
-      Alert.alert("Restaurante incluído com sucesso!");
-      buscarDadosBase();
-      Keyboard.dismiss();
-      setNomeRestaurante("");
+    if (nome != "") {
+      let response = await fetch(config.urlRoot + "incluirRestaurante", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: nome.toUpperCase(),
+        }),
+      });
+      let incluidoSucesso = await response.json();
+      if (incluidoSucesso) {
+        Alert.alert("Restaurante incluído com sucesso!");
+        buscarDadosBase();
+        Keyboard.dismiss();
+        setNomeRestaurante("");
+      }
     }
   }
 
@@ -161,21 +162,20 @@ export default function AlterarRestaurantesScreen({
 
   return (
     <KeyboardAvoidingView style={styles.container}>
+      <View style={{ marginTop: 40 }}></View>
       {mostrarRestaurantes == true && (
-        <ScrollView contentContainerStyle={styles.listaRestaurantesContainer}>
-          <FlatList
-            data={listaRestaurantes}
-            keyExtractor={(item) => item.restauranteId.toString()}
-            extraData={atualizaFlatList}
-            renderItem={(itemData) => (
-              <AlterarRestaurantesItemScreen
-                itemRestaurante={itemData.item}
-                onDelete={excluirRestauranteConfirmacao}
-                onUpdate={alterarRestauranteHandler}
-              />
-            )}
-          />
-        </ScrollView>
+        <FlatList
+          data={listaRestaurantes}
+          keyExtractor={(item) => item.restauranteId.toString()}
+          extraData={atualizaFlatList}
+          renderItem={(itemData) => (
+            <AlterarRestaurantesItemScreen
+              itemRestaurante={itemData.item}
+              onDelete={excluirRestauranteConfirmacao}
+              onUpdate={alterarRestauranteHandler}
+            />
+          )}
+        />
       )}
       <View style={styles.incluirRestauranteContainer}>
         <View style={styles.adicionarRestauranteContainer}>
@@ -183,6 +183,7 @@ export default function AlterarRestaurantesScreen({
             value={nomeRestaurante}
             placeholder="Adicionar cliente"
             onChangeText={nomeInputHandler}
+            placeholderTextColor="gray"
           />
         </View>
 

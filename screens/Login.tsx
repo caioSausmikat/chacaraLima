@@ -74,10 +74,34 @@ export default function Login({ navigation }: RootStackScreenProps<"Login">) {
   //Envio do formulario de login
   async function sendForm() {
     if (usuario === "" || senha === "") {
-      setMostrarErroUsuarioSenha(true);
-      setTimeout(() => {
-        setMostrarErroUsuarioSenha(false);
-      }, 5000);
+      if (usuario !== "") {
+        let response = await fetch(`${config.urlRoot}verificaUsuarioNovo`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            usuario: usuario.toUpperCase(),
+          }),
+        });
+        let json = await response.json();
+        if (json === "erro" || json.senha != null) {
+          setMostrarErroUsuarioSenha(true);
+          setTimeout(() => {
+            setMostrarErroUsuarioSenha(false);
+          }, 5000);
+        } else {
+          if (json.senha == null) {
+            navigation.navigate("CriarSenha", { usuario: usuario });
+          }
+        }
+      } else {
+        setMostrarErroUsuarioSenha(true);
+        setTimeout(() => {
+          setMostrarErroUsuarioSenha(false);
+        }, 5000);
+      }
     } else {
       let response = await fetch(`${config.urlRoot}login`, {
         method: "POST",
@@ -99,8 +123,16 @@ export default function Login({ navigation }: RootStackScreenProps<"Login">) {
         await AsyncStorage.clear();
       } else {
         await AsyncStorage.setItem("userData", JSON.stringify(json));
-        if (json.tiposUsuariosId === 1) {
-          navigation.navigate("Administrador", { usuario: json });
+        switch (json.tiposUsuariosId) {
+          case 1:
+            navigation.navigate("Administrador", { usuario: json });
+            break;
+          case 2:
+            navigation.navigate("Usuario", { usuario: json });
+            break;
+          case 3:
+            navigation.navigate("Cliente", { usuario: json });
+            break;
         }
       }
     }
@@ -109,107 +141,105 @@ export default function Login({ navigation }: RootStackScreenProps<"Login">) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
+      style={[styles.container, { justifyContent: "center" }]}
     >
       <View>
-        <View>
-          <Image
-            source={require("../assets/images/logomarca.png")}
-            style={styles.logomarca}
-          ></Image>
-        </View>
+        <Image
+          source={require("../assets/images/logomarca.png")}
+          style={styles.logomarca}
+        ></Image>
+      </View>
 
-        <View>
-          <Stack space={4} w="100%" alignItems="center">
-            <Input
-              w={{
-                base: "75%",
-                md: "25%",
-              }}
-              InputLeftElement={
-                <Icon
-                  as={<MaterialIcons name="person" />}
-                  size={5}
-                  ml="2"
-                  color="muted.400"
-                />
-              }
-              value={usuario}
-              onChangeText={(text) => setUsuario(text)}
-              placeholder="Usuário"
-            />
-            <Input
-              w={{
-                base: "75%",
-                md: "25%",
-              }}
-              type={mostrarSenha ? "text" : "password"}
-              InputRightElement={
-                <IconButton
-                  icon={
-                    <Icon
-                      as={
-                        <MaterialIcons
-                          name={mostrarSenha ? "visibility-off" : "visibility"}
-                        />
-                      }
-                      size={5}
-                      mr="2"
-                      color="muted.400"
-                      onPress={mostrarSenhaHandler}
-                    />
-                  }
-                />
-              }
-              value={senha}
-              onChangeText={(text) => setSenha(text)}
-              placeholder="Senha"
-            />
-            {mostrarErroUsuarioSenha && (
-              <Box alignItems="center">
-                <FormControl isInvalid w="100%">
-                  <FormControl.ErrorMessage
-                    leftIcon={<WarningOutlineIcon size="xs" />}
-                  >
-                    Usuário ou senha inválidos
-                  </FormControl.ErrorMessage>
-                </FormControl>
-              </Box>
-            )}
-          </Stack>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("RedefinirSenha", { usuario: usuario });
+      <View>
+        <Stack space={4} w="100%" alignItems="center">
+          <Input
+            w={{
+              base: "75%",
+              md: "25%",
             }}
+            InputLeftElement={
+              <Icon
+                as={<MaterialIcons name="person" />}
+                size={5}
+                ml="2"
+                color="muted.400"
+              />
+            }
+            value={usuario}
+            onChangeText={(text) => setUsuario(text)}
+            placeholder="Usuário"
+          />
+          <Input
+            w={{
+              base: "75%",
+              md: "25%",
+            }}
+            type={mostrarSenha ? "text" : "password"}
+            InputRightElement={
+              <IconButton
+                icon={
+                  <Icon
+                    as={
+                      <MaterialIcons
+                        name={mostrarSenha ? "visibility-off" : "visibility"}
+                      />
+                    }
+                    size={5}
+                    mr="2"
+                    color="muted.400"
+                    onPress={mostrarSenhaHandler}
+                  />
+                }
+              />
+            }
+            value={senha}
+            onChangeText={(text) => setSenha(text)}
+            placeholder="Senha"
+          />
+          {mostrarErroUsuarioSenha && (
+            <Box alignItems="center">
+              <FormControl isInvalid w="100%">
+                <FormControl.ErrorMessage
+                  leftIcon={<WarningOutlineIcon size="xs" />}
+                >
+                  Usuário ou senha inválidos
+                </FormControl.ErrorMessage>
+              </FormControl>
+            </Box>
+          )}
+        </Stack>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("RedefinirSenha", { usuario: usuario });
+          }}
+        >
+          <View style={styles.esqueceuSenhaContainer}>
+            <Text style={styles.esqueceuSenhaText}>Esqueceu sua senha?</Text>
+          </View>
+        </TouchableOpacity>
+        <Stack
+          mb="2.5"
+          mt="1.5"
+          direction={{
+            base: "column",
+            md: "row",
+          }}
+          space={2}
+          mx={{
+            base: "auto",
+            md: "0",
+          }}
+        >
+          <Button
+            size="lg"
+            variant="solid"
+            colorScheme="emerald"
+            style={styles.loginButton}
+            onPress={() => sendForm()}
           >
-            <View style={styles.esqueceuSenhaContainer}>
-              <Text style={styles.esqueceuSenhaText}>Esqueceu sua senha?</Text>
-            </View>
-          </TouchableOpacity>
-          <Stack
-            mb="2.5"
-            mt="1.5"
-            direction={{
-              base: "column",
-              md: "row",
-            }}
-            space={2}
-            mx={{
-              base: "auto",
-              md: "0",
-            }}
-          >
-            <Button
-              size="lg"
-              variant="solid"
-              colorScheme="emerald"
-              style={styles.loginButton}
-              onPress={() => sendForm()}
-            >
-              Entrar
-            </Button>
-          </Stack>
-        </View>
+            Entrar
+          </Button>
+        </Stack>
       </View>
     </KeyboardAvoidingView>
   );

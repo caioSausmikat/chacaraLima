@@ -14,7 +14,7 @@ export default function UsuariosItemScreen(props: any) {
         style={styles.listaUsuariosIconeExcluir}
         onPress={props.onEdit.bind(props, props.itemUsuario)}
       >
-        <MaterialCommunityIcons name="pencil" size={20} color="gray" />
+        <MaterialCommunityIcons name="pencil" size={25} color="gray" />
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -25,7 +25,7 @@ export default function UsuariosItemScreen(props: any) {
           props.itemUsuario.usuario
         )}
       >
-        <MaterialCommunityIcons name="delete" size={20} color="gray" />
+        <MaterialCommunityIcons name="delete" size={25} color="gray" />
       </TouchableOpacity>
     </View>
   );

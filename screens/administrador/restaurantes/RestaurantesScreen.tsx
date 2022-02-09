@@ -3,9 +3,9 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   Keyboard,
   Alert,
+  Platform,
 } from "react-native";
 import { RootTabScreenProps } from "../../../types";
 import { styles } from "../../../assets/styles/styles";
@@ -15,6 +15,7 @@ import { FlatList } from "native-base";
 import RestaurantesItemScreen from "./RestaurantesItemScreen";
 import { Ionicons } from "@expo/vector-icons";
 import capitalize from "../../../functions/capitalize";
+import { TextInputMask } from "react-native-masked-text";
 
 interface RestauranteDropdownList {
   label: string;
@@ -172,7 +173,7 @@ export default function RestaurantesScreen({
     listaProdutosRestaurante.length = 0;
     for (const item of json) {
       listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}`,
+        key: `${item.restauranteId}${item.produtoId}${new Date()}`,
         produtoId: item.produtoId,
         restauranteId: item.restauranteId,
         nome: capitalize(item.Produto.nome),
@@ -273,11 +274,11 @@ export default function RestaurantesScreen({
   async function alteraProdutoHandler(
     restauranteId: number,
     produtoId: number,
-    valor: number,
+    valor: string,
     valorNovo: string
   ) {
     const valorNovoConvertido = Number(valorNovo.replace(",", "."));
-    if (valor !== valorNovoConvertido) {
+    if (valor !== valorNovo) {
       let response = await fetch(
         config.urlRoot + "atualizaValorProdutoRestaurante",
         {
@@ -335,10 +336,14 @@ export default function RestaurantesScreen({
   return (
     <View style={styles.container}>
       {mostrarListaRestaurantes == true && (
-        <View style={styles.dropdownPickerRestauranteContainer}>
+        <View
+          style={[
+            styles.dropdownPickerRestauranteContainer,
+            Platform.OS === "ios" ? { zIndex: 3000 } : null,
+          ]}
+        >
           <DropDownPicker
             zIndex={3000}
-            zIndexInverse={3000}
             style={styles.dropdownPickerRestauranteStyle}
             open={openDropDownRestaurantes}
             value={codigoRestauranteSelecionado}
@@ -355,27 +360,28 @@ export default function RestaurantesScreen({
           />
         </View>
       )}
-      {/* {mostrarProdutosRestaurante == true && ( */}
-      <ScrollView contentContainerStyle={{ width: "92%", alignSelf: "center" }}>
-        <FlatList
-          data={listaProdutosRestaurante}
-          extraData={atualizaFlatList}
-          renderItem={(itemData) => (
-            <RestaurantesItemScreen
-              itemProduto={itemData.item}
-              onDelete={excluirProdutoConfirmacao}
-              onUpdate={alteraProdutoHandler}
-            />
-          )}
-        />
-      </ScrollView>
-      {/* )} */}
+      <FlatList
+        data={listaProdutosRestaurante}
+        extraData={atualizaFlatList}
+        removeClippedSubviews={false}
+        renderItem={(itemData) => (
+          <RestaurantesItemScreen
+            itemProduto={itemData.item}
+            onDelete={excluirProdutoConfirmacao}
+            onUpdate={alteraProdutoHandler}
+          />
+        )}
+      />
       {mostrarListaRestaurantes == true && mostrarListaProdutos == true && (
         <View style={styles.dropdownPickerAdcionarProdutosContainer}>
-          <View style={styles.dropdownPickerAdcionarProdutos}>
+          <View
+            style={[
+              styles.dropdownPickerAdcionarProdutos,
+              Platform.OS === "ios" ? { zIndex: 3000 } : null,
+            ]}
+          >
             <DropDownPicker
-              zIndex={2000}
-              zIndexInverse={4000}
+              zIndexInverse={3000}
               dropDownDirection="TOP"
               style={styles.dropdownPickerProdutos}
               open={openDropDownProdutos}
@@ -391,12 +397,18 @@ export default function RestaurantesScreen({
           </View>
 
           <View style={styles.adicionarProdutoValorContainer}>
-            <TextInput
+            <TextInputMask
+              type={"money"}
+              caretHidden={true}
+              onFocus={() => {
+                setValorProduto("");
+              }}
               placeholder="R$"
               value={valorProduto}
-              maxLength={6}
-              keyboardType="decimal-pad"
+              maxLength={8}
+              keyboardType="numeric"
               onChangeText={valorInputHandler}
+              placeholderTextColor="gray"
             />
           </View>
 
@@ -406,7 +418,7 @@ export default function RestaurantesScreen({
               incluiProdutoRestauranteHandler(
                 codigoRestauranteSelecionado,
                 codigoProdutoSelecionado,
-                valorProduto
+                valorProduto.replace("R$", "")
               );
             }}
           >

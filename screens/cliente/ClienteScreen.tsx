@@ -7,15 +7,17 @@ import {
   Text,
   Platform,
 } from "react-native";
-import { styles } from "../../../assets/styles/styles";
+import { styles } from "../../assets/styles/styles";
 import DropDownPicker from "react-native-dropdown-picker";
-import config from "../../../config/config.json";
+import config from "../../config/config.json";
 import { FlatList } from "native-base";
-import PedidosItemScreen from "./PedidosItemScreen";
-import capitalize from "../../../functions/capitalize";
+import ClienteItemScreen from "./ClienteItemScreen";
+import capitalize from "../../functions/capitalize";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
-import dataBr from "../../../functions/dataBr";
+import dataBr from "../../functions/dataBr";
+import Constants from "expo-constants";
+import * as Notifications from "expo-notifications";
 
 interface RestauranteDropdownList {
   label: string;
@@ -41,7 +43,7 @@ interface Pedido {
   valorProduto: number;
 }
 
-export default function PedidosScreen(props: any) {
+export default function ClienteScreen(props: any) {
   const [openDropDownRestaurantes, setOpenDropDownRestaurantes] =
     useState(false);
 
@@ -74,6 +76,13 @@ export default function PedidosScreen(props: any) {
   const [show, setShow] = useState(false);
   const [showButtons, setShowButtons] = useState(true);
 
+  const [
+    mostraMensagemClienteSemRestauranteVinculado,
+    setMostraMensagemClienteSemRestauranteVinculado,
+  ] = useState(false);
+
+  const [expoPushToken, setExpoPushToken] = useState(null);
+
   useEffect(() => {
     Keyboard.addListener("keyboardDidShow", () => {
       setShowButtons(false); // or some other action
@@ -82,26 +91,29 @@ export default function PedidosScreen(props: any) {
       setShowButtons(true); // or some other action
     });
 
-    buscarDadosIniciais();
+    if (props.route.params.usuarioLogado.restaurantesId > 0) {
+      setMostraMensagemClienteSemRestauranteVinculado(false);
+      buscarDadosIniciais();
+    } else {
+      setMostraMensagemClienteSemRestauranteVinculado(true);
+    }
   }, []);
 
   useEffect(() => {
-    atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+    registerForPushNotificationsAsync();
+    atualizaProdutosRestaurante();
   }, [dataPedido]);
+
+  useEffect(() => {
+    if (expoPushToken != null) {
+      sendToken();
+    }
+  }, [expoPushToken]);
 
   async function buscarDadosIniciais() {
     try {
-      const buscarListaRestaurantesResponse = await buscarListaRestaurantes();
-      const jsonBuscarListaRestaurantes =
-        await buscarListaRestaurantesResponse.json();
-      const carregarListaRestauranteResponse = await carregarListaRestaurante(
-        jsonBuscarListaRestaurantes
-      );
-
       const buscarListaProdutosRestauranteSelecionadoResponse =
-        await buscarListaProdutosRestauranteSelecionado(
-          carregarListaRestauranteResponse
-        );
+        await buscarListaProdutosRestauranteSelecionado();
       const jsonBuscarListaProdutosRestauranteSelecionado =
         await buscarListaProdutosRestauranteSelecionadoResponse.json();
 
@@ -115,9 +127,9 @@ export default function PedidosScreen(props: any) {
     }
   }
 
-  async function atualizaProdutosRestaurante(restauranteId: number) {
+  async function atualizaProdutosRestaurante() {
     const buscarListaProdutosRestauranteSelecionadoResponse =
-      await buscarListaProdutosRestauranteSelecionado(restauranteId);
+      await buscarListaProdutosRestauranteSelecionado();
 
     const jsonBuscarListaProdutosRestauranteSelecionado =
       await buscarListaProdutosRestauranteSelecionadoResponse.json();
@@ -129,38 +141,8 @@ export default function PedidosScreen(props: any) {
     );
   }
 
-  //Busca lista de restaurantes
-  function buscarListaRestaurantes() {
-    return fetch(`${config.urlRoot}listaRestaurantes`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    });
-  }
-
-  function carregarListaRestaurante(json: any) {
-    if (json.length > 0) {
-      setmostrarListaRestaurantes(true);
-      listaRestaurantes.length = 0;
-      for (const item of json) {
-        listaRestaurantes.push({
-          label: capitalize(item.nome),
-          value: item.id,
-        });
-      }
-      setCodigoRestauranteSelecionado(listaRestaurantes[0].value);
-      return listaRestaurantes[0].value;
-    } else {
-      setmostrarListaRestaurantes(false);
-      return [];
-    }
-  }
-
   //Busca pedido para restaurante e data selecionados
-  function buscarListaProdutosRestauranteSelecionado(restauranteId: number) {
+  function buscarListaProdutosRestauranteSelecionado() {
     return fetch(`${config.urlRoot}detalhaPedido`, {
       method: "POST",
       headers: {
@@ -168,7 +150,7 @@ export default function PedidosScreen(props: any) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        codigoRestaurante: restauranteId,
+        codigoRestaurante: props.route.params.usuarioLogado.restaurantesId,
         dataPedido: dataPedido,
       }),
     });
@@ -226,6 +208,55 @@ export default function PedidosScreen(props: any) {
     }
   }
 
+  //Registra o token do usuário
+  async function registerForPushNotificationsAsync() {
+    let token: any;
+    if (Constants.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
+      setExpoPushToken(token);
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+
+    return token;
+  }
+
+  //Envio do token
+  async function sendToken() {
+    await fetch(config.urlRoot + "token", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: expoPushToken,
+        usuarioId: props.route.params.usuarioLogado.id,
+      }),
+    });
+  }
+
   async function salvarPedido() {
     let response = await fetch(config.urlRoot + "salvarPedido", {
       method: "POST",
@@ -239,7 +270,7 @@ export default function PedidosScreen(props: any) {
     });
     let salvoSucesso = await response.json();
     if (salvoSucesso) {
-      atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+      atualizaProdutosRestaurante();
       Keyboard.dismiss();
       Alert.alert("Pedido salvo com sucesso!");
     }
@@ -260,54 +291,45 @@ export default function PedidosScreen(props: any) {
 
   return (
     <View style={styles.container}>
-      {mostrarListaRestaurantes == true && (
-        <View
-          style={
-            Platform.OS === "ios"
-              ? { zIndex: 3000, flexDirection: "row", marginTop: 40 }
-              : { flexDirection: "row", marginTop: 40 }
-          }
-        >
-          <TouchableOpacity onPress={onPressDateHandler}>
-            <Ionicons
-              style={{ color: "#418ac7", marginLeft: 20 }}
-              name="calendar"
-              size={40}
-              title="Show date picker!"
-            />
-          </TouchableOpacity>
-          <View style={styles.pedidosData}>
-            <Text
-              style={{
-                fontWeight: "bold",
-                color: "#418ac7",
-                alignSelf: "center",
-                fontSize: 14,
-              }}
-            >
-              {dataBr(dataPedido)}
-            </Text>
-          </View>
-
-          <DropDownPicker
-            zIndex={3000}
-            style={styles.dropdownPickerPedidosStyle}
-            open={openDropDownRestaurantes}
-            value={codigoRestauranteSelecionado}
-            items={listaRestaurantes}
-            setOpen={setOpenDropDownRestaurantes}
-            setValue={setCodigoRestauranteSelecionado}
-            placeholder="Selecione o restaurante"
-            dropDownContainerStyle={{
-              borderColor: "green",
-              width: "55%",
-            }}
-            onChangeValue={() => {
-              atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-            }}
-          />
+      {mostraMensagemClienteSemRestauranteVinculado == true && (
+        <View style={styles.mensagemSemPedidoContainer}>
+          <Text style={styles.mensageSemPedidoText}>
+            O seu cadastro não está completo, favor entrar em contato com o
+            administrador do sistema.
+          </Text>
         </View>
       )}
+
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: 20,
+          marginBottom: 20,
+          justifyContent: "center",
+        }}
+      >
+        <TouchableOpacity onPress={onPressDateHandler}>
+          <Ionicons
+            style={{ color: "#418ac7", marginLeft: 20 }}
+            name="calendar"
+            size={40}
+            title="Show date picker!"
+          />
+        </TouchableOpacity>
+        <View style={[styles.pedidosData, { width: "35%" }]}>
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: "#418ac7",
+              alignSelf: "center",
+              fontSize: 16,
+            }}
+          >
+            {dataBr(dataPedido)}
+          </Text>
+        </View>
+      </View>
+
       <View>
         {show == true && (
           <DateTimePicker
@@ -326,7 +348,8 @@ export default function PedidosScreen(props: any) {
           extraData={atualizaFlatList}
           removeClippedSubviews={false}
           renderItem={(itemData) => (
-            <PedidosItemScreen
+            <ClienteItemScreen
+              dataPedido={dataPedido}
               itemProduto={itemData.item}
               onUpdate={atualizaListaProdutosRestaurante}
             />
@@ -337,12 +360,12 @@ export default function PedidosScreen(props: any) {
       {listaProdutosRestaurante.length === 0 && (
         <View style={styles.mensagemSemPedidoContainer}>
           <Text style={styles.mensageSemPedidoText}>
-            Nenhum pedido encontrado na data e no restaurante selecionado.
+            Nenhum pedido encontrado na data selecionada.
           </Text>
         </View>
       )}
 
-      {showButtons == true && (
+      {showButtons == true && dataPedido === new Date().toJSON().slice(0, 10) && (
         <View
           style={{
             flexDirection: "row",
@@ -350,18 +373,6 @@ export default function PedidosScreen(props: any) {
             height: "15%",
           }}
         >
-          {dataPedido === new Date().toJSON().slice(0, 10) && (
-            <TouchableOpacity
-              style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}
-              onPress={() => {
-                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-              }}
-            >
-              <Text style={styles.confirmaRedefinicaoSenhaText}>
-                Buscar Pedido
-              </Text>
-            </TouchableOpacity>
-          )}
           <TouchableOpacity
             style={styles.buscaPedidoButton}
             onPress={() => {

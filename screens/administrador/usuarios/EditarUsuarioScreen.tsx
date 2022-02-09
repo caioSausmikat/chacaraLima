@@ -323,7 +323,7 @@ export default function EditarUsuarioScreen(props: any) {
     setMostrarConfirmacaoNovaSenha(!mostrarConfirmacaoSenhaNova);
 
   return (
-    <KeyboardAwareScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text style={[styles.textFormContainer, { marginTop: 10 }]}>
         Usuário:{" "}
       </Text>
@@ -347,7 +347,12 @@ export default function EditarUsuarioScreen(props: any) {
         />
       </View>
       <Text style={styles.textFormContainer}>Tipo de Usuário: </Text>
-      <View style={styles.dropdownPickerEditarUsuarioContainer}>
+      <View
+        style={[
+          styles.dropdownPickerEditarUsuarioContainer,
+          Platform.OS === "ios" ? { zIndex: 3000 } : null,
+        ]}
+      >
         <DropDownPicker
           zIndex={3000}
           zIndexInverse={1000}
@@ -358,7 +363,7 @@ export default function EditarUsuarioScreen(props: any) {
           setOpen={setOpenDropDownTiposUsuarios}
           setValue={setCodigoTipoUsuarioSelecionado}
           dropDownContainerStyle={{
-            borderColor: "gray",
+            borderColor: "green",
           }}
           placeholder="Selecione o tipo de usuário"
           onChangeValue={() => {
@@ -367,7 +372,12 @@ export default function EditarUsuarioScreen(props: any) {
         />
       </View>
       <Text style={styles.textFormContainer}>Restaurante Vinculado: </Text>
-      <View style={styles.dropdownPickerEditarUsuarioContainer}>
+      <View
+        style={[
+          styles.dropdownPickerEditarUsuarioContainer,
+          Platform.OS === "ios" ? { zIndex: 1000 } : null,
+        ]}
+      >
         <DropDownPicker
           zIndex={1000}
           zIndexInverse={3000}
@@ -378,7 +388,7 @@ export default function EditarUsuarioScreen(props: any) {
           setOpen={setOpenDropDownRestaurantes}
           setValue={setCodigoRestauranteSelecionado}
           dropDownContainerStyle={{
-            borderColor: "gray",
+            borderColor: "green",
           }}
           placeholder="Selecione o restaurante"
           onChangeValue={() => {
@@ -401,7 +411,7 @@ export default function EditarUsuarioScreen(props: any) {
       )}
       {mostrarInputTrocarSenha == true && (
         <View style={{ marginTop: 40, alignItems: "center" }}>
-          <Input
+          {/* <Input
             w={{
               base: "95%",
               md: "25%",
@@ -472,11 +482,13 @@ export default function EditarUsuarioScreen(props: any) {
                 </FormControl.ErrorMessage>
               </FormControl>
             </Box>
-          )}
+          )} */}
           <TouchableOpacity
             style={[styles.confirmaRedefinicaoSenhaContainer, { width: "40%" }]}
             onPress={() => {
-              redefinirSenha();
+              props.navigation.navigate("RedefinirPropriaSenha", {
+                usuario: props.route.params.usuario,
+              });
             }}
           >
             <Text style={styles.confirmaRedefinicaoSenhaText}>
@@ -485,6 +497,6 @@ export default function EditarUsuarioScreen(props: any) {
           </TouchableOpacity>
         </View>
       )}
-    </KeyboardAwareScrollView>
+    </View>
   );
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   Keyboard,
@@ -114,26 +113,28 @@ export default function UsuariosScreen(props: any) {
   }
 
   async function incluiUsuarioHandler(usuario: string) {
-    let response = await fetch(config.urlRoot + "incluirUsuario", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        usuario: usuario.toUpperCase(),
-      }),
-    });
-    let incluidoSucesso = await response.json();
-    if (incluidoSucesso) {
-      Alert.alert("Usuário incluído com sucesso!");
-      buscarDadosBase();
-      Keyboard.dismiss();
-      setUsuario("");
-    } else {
-      Alert.alert(
-        "O nome de usuário já existe, escolha outro nome de usuário!"
-      );
+    if (usuario != "") {
+      let response = await fetch(config.urlRoot + "incluirUsuario", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usuario: usuario.toUpperCase(),
+        }),
+      });
+      let incluidoSucesso = await response.json();
+      if (incluidoSucesso) {
+        Alert.alert("Usuário incluído com sucesso!");
+        buscarDadosBase();
+        Keyboard.dismiss();
+        setUsuario("");
+      } else {
+        Alert.alert(
+          "O nome de usuário já existe, escolha outro nome de usuário!"
+        );
+      }
     }
   }
 
@@ -150,30 +151,28 @@ export default function UsuariosScreen(props: any) {
 
   return (
     <View style={styles.container}>
+      <View style={{ marginTop: 40 }}></View>
       {mostrarUsuarios == true && (
-        // <View style={styles.listaUsuariosContainer}>
-        <ScrollView contentContainerStyle={styles.listaUsuariosContainer}>
-          <FlatList
-            data={listaUsuarios}
-            keyExtractor={(item) => item.usuarioId.toString()}
-            extraData={atualizaFlatList}
-            renderItem={(itemData) => (
-              <UsuariosItemScreen
-                itemUsuario={itemData.item}
-                onDelete={excluirUsuarioConfirmacao}
-                onEdit={editarUsuarioHandler}
-              />
-            )}
-          />
-        </ScrollView>
-        // </View>
+        <FlatList
+          data={listaUsuarios}
+          keyExtractor={(item) => item.usuarioId.toString()}
+          extraData={atualizaFlatList}
+          renderItem={(itemData) => (
+            <UsuariosItemScreen
+              itemUsuario={itemData.item}
+              onDelete={excluirUsuarioConfirmacao}
+              onEdit={editarUsuarioHandler}
+            />
+          )}
+        />
       )}
       <View style={styles.incluirUsuarioContainer}>
         <View style={styles.adicionarUsuarioContainer}>
           <TextInput
             value={usuario}
-            placeholder="Adicionar usuario"
+            placeholder="Adicionar usuário"
             onChangeText={usuarioInputHandler}
+            placeholderTextColor="gray"
           />
         </View>
 

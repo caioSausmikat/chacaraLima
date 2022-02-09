@@ -23,7 +23,11 @@ import AlterarRestaurantesScreen from "../screens/administrador/restaurantes/Alt
 import UsuariosScreen from "../screens/administrador/usuarios/UsuariosScreen";
 import EditarUsuarioScreen from "../screens/administrador/usuarios/EditarUsuarioScreen";
 import RedefinirSenhaScreen from "../screens/senha/RedefinirSenhaScreen";
+import RedefinirPropriaSenhaScreen from "../screens/senha/RedefinirPropriaSenhaScreen";
+import CriarSenhaScreen from "../screens/senha/CriarSenhaScreen";
 import Login from "../screens/Login";
+import UsuarioScreen from "../screens/usuario/UsuarioScreen";
+import ClienteScreen from "../screens/cliente/ClienteScreen";
 import {
   RootStackParamList,
   RootTabParamList,
@@ -31,6 +35,8 @@ import {
 } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 import { Ionicons } from "@expo/vector-icons";
+import { background } from "native-base/lib/typescript/theme/styled-system";
+import { styles } from "../assets/styles/styles";
 
 export default function Navigation(
   { route }: { route: any },
@@ -66,7 +72,39 @@ function RootNavigator() {
         })}
       />
       <Stack.Screen
+        name="RedefinirPropriaSenha"
+        component={RedefinirPropriaSenhaScreen}
+        options={() => ({
+          headerShown: true,
+          headerTitle: "Redefinir Senha",
+        })}
+      />
+      <Stack.Screen
+        name="CriarSenha"
+        component={CriarSenhaScreen}
+        options={() => ({
+          headerShown: true,
+          headerTitle: "Criar Senha",
+        })}
+      />
+      <Stack.Screen
         name="Administrador"
+        component={BottomTabNavigator}
+        options={({ route }) => ({
+          headerShown: true,
+          headerTitle: route.params.usuario.nome,
+        })}
+      />
+      <Stack.Screen
+        name="Usuario"
+        component={BottomTabNavigator}
+        options={({ route }) => ({
+          headerShown: true,
+          headerTitle: route.params.usuario.nome,
+        })}
+      />
+      <Stack.Screen
+        name="Cliente"
         component={BottomTabNavigator}
         options={({ route }) => ({
           headerShown: true,
@@ -109,105 +147,172 @@ function BottomTabNavigator({ route }) {
         tabBarActiveTintColor: Colors["light"].tint,
       }}
     >
-      <BottomTab.Screen
-        name="Pedidos"
-        component={PedidosScreen}
-        initialParams={{ usuarioLogado: route.params.usuario }}
-        options={{
-          headerTitle: "",
-          headerTransparent: true,
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+      {route.params.usuario.tiposUsuariosId === 1 && (
+        <BottomTab.Screen
+          name="Pedidos"
+          component={PedidosScreen}
+          initialParams={{ usuarioLogado: route.params.usuario }}
+          options={{
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
 
-            iconName = focused ? "document-text" : "document-text-outline";
+              iconName = focused ? "document-text" : "document-text-outline";
 
-            // You can return any component that you like here!
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-        }}
-      />
-      <BottomTab.Screen
-        name="Restaurantes"
-        component={RestaurantesScreen}
-        options={({ navigation }: RootTabScreenProps<"Restaurantes">) => ({
-          title: "Clientes",
-          headerTitle: "",
-          headerTransparent: true,
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          }}
+        />
+      )}
+      {route.params.usuario.tiposUsuariosId === 1 && (
+        <BottomTab.Screen
+          name="Restaurantes"
+          component={RestaurantesScreen}
+          options={({ navigation }: RootTabScreenProps<"Restaurantes">) => ({
+            title: "Clientes",
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
 
-            iconName = focused ? "ios-restaurant" : "ios-restaurant-outline";
+              iconName = focused ? "ios-restaurant" : "ios-restaurant-outline";
 
-            // You can return any component that you like here!
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate("AlterarRestaurantes")}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#4b9666",
-                  marginRight: 20,
-                  marginBottom: 15,
-                  borderRadius: 10,
-                }}
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+            headerRight: () => (
+              <Pressable
+                onPress={() => navigation.navigate("AlterarRestaurantes")}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.5 : 1,
+                })}
               >
-                <Text
+                <View
                   style={{
-                    color: "white",
-                    fontWeight: "bold",
-                    padding: 5,
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#4b9666",
+                    marginRight: 20,
+                    marginBottom: 15,
+                    borderRadius: 10,
                   }}
                 >
-                  Alterar Clientes
-                </Text>
-              </View>
-            </Pressable>
-          ),
-        })}
-      />
-      <BottomTab.Screen
-        name="Produtos"
-        component={ProdutosScreen}
-        options={({ navigation }: RootTabScreenProps<"Produtos">) => ({
-          title: "Produtos",
-          headerTitle: "",
-          headerTransparent: true,
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      padding: 5,
+                    }}
+                  >
+                    Alterar Clientes
+                  </Text>
+                </View>
+              </Pressable>
+            ),
+          })}
+        />
+      )}
+      {route.params.usuario.tiposUsuariosId === 1 && (
+        <BottomTab.Screen
+          name="Produtos"
+          component={ProdutosScreen}
+          options={({ navigation }: RootTabScreenProps<"Produtos">) => ({
+            title: "Produtos",
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
 
-            iconName = focused ? "leaf" : "leaf-outline";
+              iconName = focused ? "leaf" : "leaf-outline";
 
-            // You can return any component that you like here!
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-        })}
-      />
-      <BottomTab.Screen
-        name="Usuarios"
-        component={UsuariosScreen}
-        initialParams={{ usuarioLogado: route.params.usuario }}
-        options={{
-          title: "Usuarios",
-          headerTitle: "",
-          headerTransparent: true,
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          })}
+        />
+      )}
+      {route.params.usuario.tiposUsuariosId === 1 && (
+        <BottomTab.Screen
+          name="Usuarios"
+          component={UsuariosScreen}
+          initialParams={{ usuarioLogado: route.params.usuario }}
+          options={{
+            title: "Usuarios",
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
 
-            iconName = focused ? "people-sharp" : "people-outline";
+              iconName = focused ? "people-sharp" : "people-outline";
 
-            // You can return any component that you like here!
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-        }}
-      />
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          }}
+        />
+      )}
+      {route.params.usuario.tiposUsuariosId === 2 && (
+        <BottomTab.Screen
+          name="Pedidos"
+          component={UsuarioScreen}
+          initialParams={{ usuarioLogado: route.params.usuario }}
+          options={{
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+
+              iconName = focused ? "document-text" : "document-text-outline";
+
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          }}
+        />
+      )}
+      {route.params.usuario.tiposUsuariosId === 3 && (
+        <BottomTab.Screen
+          name="Pedidos"
+          component={ClienteScreen}
+          initialParams={{ usuarioLogado: route.params.usuario }}
+          options={{
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+
+              iconName = focused ? "document-text" : "document-text-outline";
+
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          }}
+        />
+      )}
+      {(route.params.usuario.tiposUsuariosId === 2 ||
+        route.params.usuario.tiposUsuariosId === 3) && (
+        <BottomTab.Screen
+          name="RedefinirPropriaSenha"
+          component={RedefinirPropriaSenhaScreen}
+          initialParams={{ usuario: route.params.usuario }}
+          options={{
+            title: "Alterar Senha",
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+
+              iconName = focused ? "key" : "key-outline";
+
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          }}
+        />
+      )}
     </BottomTab.Navigator>
   );
 }

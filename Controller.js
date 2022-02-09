@@ -48,6 +48,21 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/verificaUsuarioNovo", async (req, res) => {
+  let response = await usuarios
+    .findOne({
+      where: { usuario: req.body.usuario },
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  if (response === null) {
+    res.send(JSON.stringify("erro"));
+  } else {
+    res.send(response);
+  }
+});
+
 app.post("/verifyPass", async (req, res) => {
   let response = await usuarios.findOne({
     where: { id: req.body.id, senha: req.body.senhaAntiga },
@@ -477,6 +492,37 @@ app.post("/alteraIndicadorAlteracaoSenha", async (req, res) => {
 
 //Redefinir senha
 app.post("/redefinirSenha", async (req, res) => {
+  let verificaSenhaAtualResponse = await usuarios
+    .findOne({
+      where: {
+        usuario: req.body.usuario,
+        senha: req.body.senhaAtual,
+      },
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  if (verificaSenhaAtualResponse === null) {
+    res.send(false);
+  } else {
+    let response = await usuarios
+      .findAll({
+        where: {
+          usuario: req.body.usuario,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    response[0].senha = req.body.senhaNova;
+    response[0].updateAt = new Date();
+    response[0].save();
+    res.send(true);
+  }
+});
+
+//Criar senha
+app.post("/criarSenha", async (req, res) => {
   let response = await usuarios
     .findAll({
       where: {
@@ -494,6 +540,8 @@ app.post("/redefinirSenha", async (req, res) => {
 
 //Detalha pedido
 app.post("/detalhaPedido", async (req, res) => {
+  let listaFinalResponse = [];
+
   if (req.body.dataPedido === new Date().toJSON().slice(0, 10)) {
     const buscaPedidoResponse = await pedidos
       .findAll({
@@ -506,18 +554,29 @@ app.post("/detalhaPedido", async (req, res) => {
         console.log(err);
       });
 
+    const response = await sequelize.query(
+      `SELECT A.restauranteId, A.produtoId, FORMAT(A.valor,2) AS valorProduto, ' ' AS dataPedido, ' ' AS usuarioId, ' ' AS nomeUsuario, 0 AS quantidadeProduto, B.nome FROM produtosrestaurantes A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND B.ativo = 1`,
+      { raw: true }
+    );
+
     if (buscaPedidoResponse.length > 0) {
-      const response = await sequelize.query(
-        `SELECT A.restauranteId, A.produtoId, FORMAT((CASE WHEN B.valorProduto IS NOT NULL THEN B.valorProduto ELSE A.valor END),2) AS valorProduto, B.dataPedido, IFNULL(B.usuarioId, 0) AS usuarioId, IFNULL(B.nomeUsuario,'') AS nomeUsuario, IFNULL(B.quantidadeProduto,0) AS quantidadeProduto, C.nome FROM produtosRestaurantes A LEFT OUTER JOIN pedidos B ON A.restauranteId = B.restauranteId AND A.produtoId = B.produtoId, produtos C WHERE A.produtoId = C.id AND A.restauranteId = ${req.body.codigoRestaurante} AND C.ativo = 1 HAVING (B.dataPedido = '${req.body.dataPedido}' OR B.dataPedido IS NULL)`,
-        { raw: true }
-      );
-      res.send(JSON.stringify(response));
+      for (const itemRestaurante of response[0]) {
+        for (const itemPedido of buscaPedidoResponse) {
+          if (itemRestaurante.produtoId === itemPedido.produtoId) {
+            itemRestaurante.valorProduto = itemPedido.valorProduto
+              .toFixed(2)
+              .toString();
+            itemRestaurante.dataPedido = itemPedido.dataPedido;
+            itemRestaurante.nomeUsuario = itemPedido.nomeUsuario;
+            itemRestaurante.quantidadeProduto = itemPedido.quantidadeProduto;
+          }
+        }
+        listaFinalResponse.push(itemRestaurante);
+      }
     } else {
-      const response = await sequelize.query(
-        `SELECT A.restauranteId, A.produtoId, FORMAT(A.valor,2) AS valorProduto, ' ' AS dataPedido, ' ' AS usuarioId, ' ' AS nomeUsuario, 0 AS quantidadeProduto, B.nome FROM produtosrestaurantes A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND B.ativo = 1`,
-        { raw: true }
-      );
-      res.send(JSON.stringify(response));
+      for (const itemRestaurante of response[0]) {
+        listaFinalResponse.push(itemRestaurante);
+      }
     }
   } else {
     const response = await sequelize.query(
@@ -525,8 +584,11 @@ app.post("/detalhaPedido", async (req, res) => {
       { raw: true }
     );
 
-    res.send(JSON.stringify(response));
+    for (const itemRestaurante of response[0]) {
+      listaFinalResponse.push(itemRestaurante);
+    }
   }
+  res.send(JSON.stringify(listaFinalResponse));
 });
 
 //Salva pedido
@@ -573,78 +635,19 @@ app.post("/salvarPedido", async (req, res) => {
   }
 });
 
-//Inclui produto em pedido
-app.post("/incluirProdutoPedido", async (req, res) => {
-  let response = await pedidos
-    .create({
-      dataPedido: req.body.dataPedido,
-      restauranteId: req.body.restauranteId,
+//Grava token na DB
+app.post("/token", async (req, res) => {
+  console.log(rea.body);
+  let response = await tokens.findOne({ where: { token: req.body.token } });
+  if (response == null) {
+    token.create({
+      token: req.body.token,
       usuarioId: req.body.usuarioId,
-      nomeUsuario: req.body.nomeUsuario,
-      produtoId: req.body.produtoId,
-      quantidadeProduto: req.body.quantidadeProduto,
-      valorProduto: req.body.valorProduto,
       createdAt: Date(),
       updatedAt: Date(),
-    })
-    .catch((err) => {
-      console.log(err);
     });
-  if (response) {
-    res.send(true);
   }
 });
-
-//Atualiza quantidade de produto do pedido
-app.post("/atualizaQuantidadeProdutoPedido", async (req, res) => {
-  let response = await pedidos
-    .findAll({
-      where: {
-        dataPedido: req.body.dataPedido,
-        restauranteId: req.body.restauranteId,
-        produtoId: req.body.produtoId,
-      },
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  response[0].quantidadeProduto = req.body.quantidadeProduto;
-  response[0].usuarioId = req.body.usuarioId;
-  response[0].nomeUsuario = req.body.nomeUsuario;
-  response[0].updateAt = new Date();
-  response[0].save();
-  res.send(true);
-});
-
-//Exclui produto de pedido
-app.post("/excluirProdutoPedido", async (req, res) => {
-  let response = await pedidos
-    .destroy({
-      where: {
-        dataPedido: req.body.dataPedido,
-        restauranteId: req.body.restauranteId,
-        produtoId: req.body.produtoId,
-      },
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  if (response === 1) {
-    res.send(true);
-  }
-});
-
-// //Grava token na DB
-// app.post("/token", async (req, res) => {
-//   let response = await token.findOne({ where: { token: req.body.token } });
-//   if (response == null) {
-//     token.create({
-//       token: req.body.token,
-//       createdAt: Date(),
-//       updatedAt: Date(),
-//     });
-//   }
-// });
 
 // //Envio das notificações
 // app.post("/notifications", async (req, res) => {

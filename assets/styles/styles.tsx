@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
     borderColor: "green",
   },
   listaProdutosRestauranteContainer: {
+    flex: 1,
     flexDirection: "row",
   },
   produtosRestauranteContainer: {
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
   },
   produtosValorContainer: {
     borderRadius: 5,
-    borderColor: "gray",
+    borderColor: "green",
     borderWidth: 1,
     margin: 3,
     width: "20%",
@@ -69,17 +70,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "white",
   },
-  listaProdutosContainer: {
-    marginLeft: 15,
-    marginTop: 30,
-  },
   produtosContainer: {
     padding: 5,
     borderRadius: 5,
-    borderColor: "gray",
+    borderColor: "green",
     borderWidth: 1,
-    margin: 5,
-    width: "85%",
+    margin: 3,
+    width: "80%",
+    marginLeft: 20,
   },
   adicionarProdutoContainer: {
     borderRadius: 5,
@@ -103,10 +101,11 @@ const styles = StyleSheet.create({
   restaurantesContainer: {
     padding: 5,
     borderRadius: 5,
-    borderColor: "gray",
+    borderColor: "green",
     borderWidth: 1,
-    margin: 5,
-    width: "85%",
+    margin: 3,
+    width: "80%",
+    marginLeft: 20,
   },
   adicionarRestauranteContainer: {
     borderRadius: 5,
@@ -127,18 +126,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: 7,
   },
-
-  listaUsuariosContainer: {
-    marginLeft: 15,
-    marginTop: 40,
-  },
   usuariosContainer: {
-    padding: 5,
+    padding: 10,
     borderRadius: 5,
-    borderColor: "gray",
+    borderColor: "green",
     borderWidth: 1,
-    margin: 5,
-    width: "80%",
+    margin: 3,
+    width: "75%",
+    marginLeft: 20,
   },
   adicionarUsuarioContainer: {
     borderRadius: 5,
@@ -160,12 +155,13 @@ const styles = StyleSheet.create({
     marginLeft: 7,
   },
   listaUsuariosRestauranteContainer: {
+    flex: 1,
     flexDirection: "row",
   },
   editarUsuarioInputContainer: {
     padding: 10,
     borderRadius: 5,
-    borderColor: "gray",
+    borderColor: "green",
     borderWidth: 1,
     width: "95%",
     marginLeft: 10,
@@ -177,7 +173,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   dropdownPickerEditarUsuario: {
-    borderColor: "gray",
+    borderColor: "green",
   },
   textFormContainer: {
     textAlign: "center",
@@ -240,6 +236,29 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     borderColor: "green",
     width: "55%",
+  },
+  buscaPedidoButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    borderRadius: 50,
+    width: "40%",
+    height: "35%",
+    marginBottom: 2,
+    marginRight: 5,
+    backgroundColor: "#418ac7",
+  },
+  mensagemSemPedidoContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#4b9666",
+    borderRadius: 20,
+    margin: 30,
+  },
+  mensageSemPedidoText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

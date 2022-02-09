@@ -34,7 +34,7 @@ export default function AlterarRestaurantesItemScreen(props: any) {
           nomeRestaurante
         )}
       >
-        <MaterialCommunityIcons name="delete" size={20} color="gray" />
+        <MaterialCommunityIcons name="delete" size={25} color="gray" />
       </TouchableOpacity>
     </View>
   );
