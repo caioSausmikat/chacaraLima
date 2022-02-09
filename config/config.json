@@ -14,11 +14,11 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "b31d7d0fe74452",
-    "password": "1eb36850",
-    "database": "heroku_95332f12ddba4e2",
+    "username": "b434a60e3afbc4",
+    "password": "8d7f8f9b",
+    "database": "heroku_459ceac1897fed1",
     "host": "us-cdbr-east-05.cleardb.net",
     "dialect": "mysql"
   },
-  "urlRoot": "http://192.168.100.127:3000/"
+  "urlRoot": "https://chacaralima.herokuapp.com/"
 }
