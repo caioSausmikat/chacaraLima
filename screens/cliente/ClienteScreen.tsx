@@ -16,8 +16,6 @@ import capitalize from "../../functions/capitalize";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import dataBr from "../../functions/dataBr";
-import Constants from "expo-constants";
-import * as Notifications from "expo-notifications";
 
 interface RestauranteDropdownList {
   label: string;
@@ -81,8 +79,6 @@ export default function ClienteScreen(props: any) {
     setMostraMensagemClienteSemRestauranteVinculado,
   ] = useState(false);
 
-  const [expoPushToken, setExpoPushToken] = useState(null);
-
   useEffect(() => {
     Keyboard.addListener("keyboardDidShow", () => {
       setShowButtons(false); // or some other action
@@ -100,16 +96,8 @@ export default function ClienteScreen(props: any) {
   }, []);
 
   useEffect(() => {
-    console.log("test");
-    // registerForPushNotificationsAsync();
     atualizaProdutosRestaurante();
   }, [dataPedido]);
-
-  useEffect(() => {
-    if (expoPushToken != null) {
-      sendToken();
-    }
-  }, [expoPushToken]);
 
   async function buscarDadosIniciais() {
     try {
@@ -209,72 +197,81 @@ export default function ClienteScreen(props: any) {
     }
   }
 
-  //Registra o token do usuário
-  async function registerForPushNotificationsAsync() {
-    let token: any;
-    if (Constants.isDevice) {
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
-      setExpoPushToken(token);
-    } else {
-      alert("Must use physical device for Push Notifications");
-    }
-
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-
-    return token;
-  }
-
-  //Envio do token
-  async function sendToken() {
-    console.log(expoPushToken);
-    console.log(props.route.params.usuarioLogado.id);
-    await fetch(config.urlRoot + "token", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: expoPushToken,
-        usuarioId: props.route.params.usuarioLogado.id,
-      }),
-    });
-  }
-
   async function salvarPedido() {
-    let response = await fetch(config.urlRoot + "salvarPedido", {
+    if (pedido.length > 0) {
+      let response = await fetch(config.urlRoot + "salvarPedido", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pedido: pedido,
+        }),
+      });
+      let salvoSucesso = await response.json();
+      if (salvoSucesso) {
+        atualizaProdutosRestaurante();
+        Keyboard.dismiss();
+        Alert.alert("Pedido salvo com sucesso!");
+        enviarTokenPedidoRealizado();
+      }
+    }
+  }
+
+  async function enviarTokenPedidoRealizado() {
+    const buscaDadosRestauranteResponse = await buscaDadosRestaurante();
+    const jsonBuscaDadosRestauranteResponse =
+      await buscaDadosRestauranteResponse.json();
+
+    const buscaTokensResponsaveisResponse = await buscaTokensResponsaveis(
+      jsonBuscaDadosRestauranteResponse
+    );
+    const jsonBuscaTokensResponsaveisResponse =
+      await buscaTokensResponsaveisResponse.json();
+
+    await enviaNotificacao(
+      jsonBuscaDadosRestauranteResponse.nome,
+      jsonBuscaTokensResponsaveisResponse
+    );
+  }
+
+  function buscaDadosRestaurante() {
+    return fetch(config.urlRoot + "buscaDadosRestaurante", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        pedido: pedido,
-      }),
+      body: JSON.stringify({ restauranteId: pedido[0].restauranteId }),
     });
-    let salvoSucesso = await response.json();
-    if (salvoSucesso) {
-      atualizaProdutosRestaurante();
-      Keyboard.dismiss();
-      Alert.alert("Pedido salvo com sucesso!");
+  }
+
+  function buscaTokensResponsaveis(buscaDadosRestauranteResponse: any) {
+    return fetch(config.urlRoot + "buscaTokensResponsaveis", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+  }
+
+  function enviaNotificacao(nomeRestaurante: any, tokens: any) {
+    for (const item of tokens) {
+      fetch(config.urlRoot + "notifications", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipient: item.token,
+          title: "Pedido",
+          message: `${pedido[0].nomeUsuario} fez um pedido do restaurante ${nomeRestaurante}`,
+        }),
+      });
     }
   }
 

@@ -16,6 +16,8 @@ import capitalize from "../../functions/capitalize";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import dataBr from "../../functions/dataBr";
+import Constants from "expo-constants";
+import * as Notifications from "expo-notifications";
 
 interface RestauranteDropdownList {
   label: string;
@@ -74,6 +76,8 @@ export default function UsuarioScreen(props: any) {
   const [show, setShow] = useState(false);
   const [showButtons, setShowButtons] = useState(true);
 
+  const [expoPushToken, setExpoPushToken] = useState(null);
+
   useEffect(() => {
     Keyboard.addListener("keyboardDidShow", () => {
       setShowButtons(false); // or some other action
@@ -82,12 +86,19 @@ export default function UsuarioScreen(props: any) {
       setShowButtons(true); // or some other action
     });
 
+    registerForPushNotificationsAsync();
     buscarDadosIniciais();
   }, []);
 
   useEffect(() => {
     atualizaProdutosRestaurante(codigoRestauranteSelecionado);
   }, [dataPedido]);
+
+  useEffect(() => {
+    if (expoPushToken != null) {
+      sendToken();
+    }
+  }, [expoPushToken]);
 
   async function buscarDadosIniciais() {
     try {
@@ -224,6 +235,54 @@ export default function UsuarioScreen(props: any) {
         }
       }
     }
+  }
+
+  //Registra o token do usuário
+  async function registerForPushNotificationsAsync() {
+    let token: any;
+    if (Constants.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      setExpoPushToken(token);
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+
+    return token;
+  }
+
+  //Envio do token
+  async function sendToken() {
+    await fetch(config.urlRoot + "token", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: expoPushToken,
+        usuarioId: props.route.params.usuarioLogado.id,
+      }),
+    });
   }
 
   async function salvarPedido() {
