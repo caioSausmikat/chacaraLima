@@ -100,7 +100,8 @@ export default function ClienteScreen(props: any) {
   }, []);
 
   useEffect(() => {
-    registerForPushNotificationsAsync();
+    console.log("test");
+    // registerForPushNotificationsAsync();
     atualizaProdutosRestaurante();
   }, [dataPedido]);
 
@@ -224,7 +225,6 @@ export default function ClienteScreen(props: any) {
         return;
       }
       token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log(token);
       setExpoPushToken(token);
     } else {
       alert("Must use physical device for Push Notifications");
@@ -244,6 +244,8 @@ export default function ClienteScreen(props: any) {
 
   //Envio do token
   async function sendToken() {
+    console.log(expoPushToken);
+    console.log(props.route.params.usuarioLogado.id);
     await fetch(config.urlRoot + "token", {
       method: "POST",
       headers: {

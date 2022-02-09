@@ -637,10 +637,9 @@ app.post("/salvarPedido", async (req, res) => {
 
 //Grava token na DB
 app.post("/token", async (req, res) => {
-  console.log(rea.body);
   let response = await tokens.findOne({ where: { token: req.body.token } });
   if (response == null) {
-    token.create({
+    tokens.create({
       token: req.body.token,
       usuarioId: req.body.usuarioId,
       createdAt: Date(),
