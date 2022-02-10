@@ -8,12 +8,12 @@ const { Expo } = require("expo-server-sdk");
 const { engine } = require("express-handlebars");
 
 const sequelize = new Sequelize(
-  config.development.database,
-  config.development.username,
-  config.development.password,
+  config.production.database,
+  config.production.username,
+  config.production.password,
   {
-    host: config.development.host,
-    dialect: config.development.dialect,
+    host: config.production.host,
+    dialect: config.production.dialect,
   }
 );
 
