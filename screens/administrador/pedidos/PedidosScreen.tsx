@@ -6,6 +6,7 @@ import {
   Alert,
   Text,
   Platform,
+  Image,
 } from "react-native";
 import { styles } from "../../../assets/styles/styles";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -16,8 +17,10 @@ import capitalize from "../../../functions/capitalize";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import dataBr from "../../../functions/dataBr";
+import gerarPedidoExcel from "../../../functions/gerarPedidoExcel";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
+import * as Sharing from "expo-sharing";
 
 interface RestauranteDropdownList {
   label: string;
@@ -317,6 +320,22 @@ export default function PedidosScreen(props: any) {
     setShow(!show);
   };
 
+  async function shareExcel() {
+    const shareableExcelUri: string = await gerarPedidoExcel(pedido);
+    Sharing.shareAsync(shareableExcelUri, {
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
+      dialogTitle: "Your dialog title here", // Android and Web
+      UTI: "com.microsoft.excel.xlsx", // iOS
+    })
+      .catch((error) => {
+        console.error("Error", error);
+      })
+      .then(() => {
+        console.log("Return from sharing dialog");
+      });
+  }
+
   return (
     <View style={styles.container}>
       {mostrarListaRestaurantes == true && (
@@ -421,6 +440,19 @@ export default function PedidosScreen(props: any) {
               </Text>
             </TouchableOpacity>
           )}
+
+          <TouchableOpacity
+            style={styles.gerarExcelButton}
+            onPress={() => {
+              shareExcel();
+            }}
+          >
+            <Image
+              style={{ width: 50, height: 50 }}
+              source={require("../../../assets/images/excel.icon.jpg")}
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.buscaPedidoButton}
             onPress={() => {

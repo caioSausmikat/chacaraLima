@@ -243,11 +243,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     borderRadius: 50,
-    width: "40%",
+    width: "30%",
     height: "35%",
     marginBottom: 2,
     marginRight: 5,
     backgroundColor: "#418ac7",
+  },
+  gerarExcelButton: {
+    justifyContent: "center",
+    marginRight: 5,
   },
   mensagemSemPedidoContainer: {
     justifyContent: "center",

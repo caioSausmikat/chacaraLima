@@ -1,7 +1,12 @@
 {
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "node Controller.js"
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "test": "jest --watchAll"
   },
   "jest": {
     "preset": "jest-expo"
@@ -15,15 +20,18 @@
     "@react-navigation/native-stack": "^6.1.0",
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
+    "exceljs": "^4.3.0",
     "expo": "~44.0.0",
     "expo-asset": "~8.4.4",
     "expo-constants": "~13.0.0",
     "expo-dev-client": "~0.8.3",
+    "expo-file-system": "~13.1.2",
     "expo-font": "~10.0.4",
     "expo-linking": "~3.0.0",
     "expo-local-authentication": "~12.1.0",
     "expo-notifications": "~0.14.0",
     "expo-server-sdk": "^3.6.0",
+    "expo-sharing": "~10.1.0",
     "expo-splash-screen": "~0.14.0",
     "expo-status-bar": "~1.2.0",
     "expo-web-browser": "~10.1.0",

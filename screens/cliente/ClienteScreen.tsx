@@ -89,7 +89,7 @@ export default function ClienteScreen(props: any) {
   async function buscarDadosIniciais() {
     try {
       const buscaDadosRestauranteResponse = await buscaDadosRestaurante(
-        pedido[0].restauranteId
+        props.route.params.usuarioLogado.restaurantesId
       );
       const jsonBuscaDadosRestauranteResponse =
         await buscaDadosRestauranteResponse.json();
