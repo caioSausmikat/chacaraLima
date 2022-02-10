@@ -15,17 +15,19 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
+    "notification": {
+      "icon": "./assets/images/icon.png"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.caioCompany.chacaralima",
+      "buildNumber": "1.0.0"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+      "package": "com.caioCompany.chacaralima",
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

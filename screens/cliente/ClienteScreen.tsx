@@ -8,7 +8,6 @@ import {
   Platform,
 } from "react-native";
 import { styles } from "../../assets/styles/styles";
-import DropDownPicker from "react-native-dropdown-picker";
 import config from "../../config/config.json";
 import { FlatList } from "native-base";
 import ClienteItemScreen from "./ClienteItemScreen";
@@ -42,23 +41,11 @@ interface Pedido {
 }
 
 export default function ClienteScreen(props: any) {
-  const [openDropDownRestaurantes, setOpenDropDownRestaurantes] =
-    useState(false);
 
   const [atualizaFlatList, setAtualizaFlatList] = useState(false);
 
-  const [mostrarListaRestaurantes, setmostrarListaRestaurantes] =
-    useState(false);
-
   const [mostrarProdutosRestaurante, setMostrarProdutosRestaurante] =
     useState(false);
-
-  const [codigoRestauranteSelecionado, setCodigoRestauranteSelecionado] =
-    useState(0);
-
-  let [listaRestaurantes, setListaRestaurantes] = useState<
-    RestauranteDropdownList[]
-  >([]);
 
   const [listaProdutosRestaurante, setListaProdutosRestaurante] = useState<
     ProdutoRestaurante[]

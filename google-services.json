@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "405502300565",
+    "project_id": "chacaralima",
+    "storage_bucket": "chacaralima.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405502300565:android:92fe4d26321b2e064f669c",
+        "android_client_info": {
+          "package_name": "com.caioCompany.chacaralima"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "405502300565-dfsfoqo8hfaqbfpi0j0qpdeq9d1hbsip.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjF2NZtqOMMh-tTAxiGSvtYQMByh8IU5o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "405502300565-dfsfoqo8hfaqbfpi0j0qpdeq9d1hbsip.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
