@@ -542,52 +542,52 @@ app.post("/criarSenha", async (req, res) => {
 app.post("/detalhaPedido", async (req, res) => {
   let listaFinalResponse = [];
 
-  if (req.body.dataPedido === new Date().toJSON().slice(0, 10)) {
-    const buscaPedidoResponse = await pedidos
-      .findAll({
-        where: {
-          dataPedido: req.body.dataPedido,
-          restauranteId: req.body.codigoRestaurante,
-        },
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  // if (req.body.dataPedido === new Date().toJSON().slice(0, 10)) {
+  const buscaPedidoResponse = await pedidos
+    .findAll({
+      where: {
+        dataPedido: req.body.dataPedido,
+        restauranteId: req.body.codigoRestaurante,
+      },
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-    const response = await sequelize.query(
-      `SELECT A.restauranteId, A.produtoId, FORMAT(A.valor,2) AS valorProduto, ' ' AS dataPedido, ' ' AS usuarioId, ' ' AS nomeUsuario, 0 AS quantidadeProduto, B.nome FROM produtosrestaurantes A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND B.ativo = 1`,
-      { raw: true }
-    );
+  const response = await sequelize.query(
+    `SELECT A.restauranteId, A.produtoId, FORMAT(A.valor,2) AS valorProduto, ' ' AS dataPedido, ' ' AS usuarioId, ' ' AS nomeUsuario, 0 AS quantidadeProduto, B.nome FROM produtosrestaurantes A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND B.ativo = 1`,
+    { raw: true }
+  );
 
-    if (buscaPedidoResponse.length > 0) {
-      for (const itemRestaurante of response[0]) {
-        for (const itemPedido of buscaPedidoResponse) {
-          if (itemRestaurante.produtoId === itemPedido.produtoId) {
-            itemRestaurante.valorProduto = itemPedido.valorProduto
-              .toFixed(2)
-              .toString();
-            itemRestaurante.dataPedido = itemPedido.dataPedido;
-            itemRestaurante.nomeUsuario = itemPedido.nomeUsuario;
-            itemRestaurante.quantidadeProduto = itemPedido.quantidadeProduto;
-          }
+  if (buscaPedidoResponse.length > 0) {
+    for (const itemRestaurante of response[0]) {
+      for (const itemPedido of buscaPedidoResponse) {
+        if (itemRestaurante.produtoId === itemPedido.produtoId) {
+          itemRestaurante.valorProduto = itemPedido.valorProduto
+            .toFixed(2)
+            .toString();
+          itemRestaurante.dataPedido = itemPedido.dataPedido;
+          itemRestaurante.nomeUsuario = itemPedido.nomeUsuario;
+          itemRestaurante.quantidadeProduto = itemPedido.quantidadeProduto;
         }
-        listaFinalResponse.push(itemRestaurante);
       }
-    } else {
-      for (const itemRestaurante of response[0]) {
-        listaFinalResponse.push(itemRestaurante);
-      }
+      listaFinalResponse.push(itemRestaurante);
     }
   } else {
-    const response = await sequelize.query(
-      `SELECT A.restauranteId, A.produtoId, FORMAT(A.valorProduto,2) AS valorProduto, A.dataPedido, A.usuarioId, A.nomeUsuario, A.quantidadeProduto, B.nome FROM pedidos A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND A.dataPedido = '${req.body.dataPedido}'`,
-      { raw: true }
-    );
-
     for (const itemRestaurante of response[0]) {
       listaFinalResponse.push(itemRestaurante);
     }
   }
+  // } else {
+  //   const response = await sequelize.query(
+  //     `SELECT A.restauranteId, A.produtoId, FORMAT(A.valorProduto,2) AS valorProduto, A.dataPedido, A.usuarioId, A.nomeUsuario, A.quantidadeProduto, B.nome FROM pedidos A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND A.dataPedido = '${req.body.dataPedido}'`,
+  //     { raw: true }
+  //   );
+
+  //   for (const itemRestaurante of response[0]) {
+  //     listaFinalResponse.push(itemRestaurante);
+  //   }
+  // }
   res.send(JSON.stringify(listaFinalResponse));
 });
 

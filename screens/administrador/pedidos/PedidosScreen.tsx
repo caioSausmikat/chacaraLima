@@ -321,19 +321,25 @@ export default function PedidosScreen(props: any) {
   };
 
   async function shareExcel() {
-    const shareableExcelUri: string = await gerarPedidoExcel(pedido);
+    let nomeRestauranteSelecionado = "";
+    for (const restaurante of listaRestaurantes) {
+      if (restaurante.value === codigoRestauranteSelecionado)
+        [(nomeRestauranteSelecionado = restaurante.label)];
+    }
+
+    const shareableExcelUri: string = await gerarPedidoExcel(
+      pedido,
+      listaProdutosRestaurante,
+      nomeRestauranteSelecionado
+    );
     Sharing.shareAsync(shareableExcelUri, {
       mimeType:
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
       dialogTitle: "Your dialog title here", // Android and Web
       UTI: "com.microsoft.excel.xlsx", // iOS
-    })
-      .catch((error) => {
-        console.error("Error", error);
-      })
-      .then(() => {
-        console.log("Return from sharing dialog");
-      });
+    }).catch((error) => {
+      console.error("Error", error);
+    });
   }
 
   return (
@@ -441,17 +447,19 @@ export default function PedidosScreen(props: any) {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            style={styles.gerarExcelButton}
-            onPress={() => {
-              shareExcel();
-            }}
-          >
-            <Image
-              style={{ width: 50, height: 50 }}
-              source={require("../../../assets/images/excel.icon.jpg")}
-            />
-          </TouchableOpacity>
+          {pedido.length > 0 && (
+            <TouchableOpacity
+              style={styles.gerarExcelButton}
+              onPress={() => {
+                shareExcel();
+              }}
+            >
+              <Image
+                style={{ width: 50, height: 50 }}
+                source={require("../../../assets/images/excel.icon.jpg")}
+              />
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={styles.buscaPedidoButton}

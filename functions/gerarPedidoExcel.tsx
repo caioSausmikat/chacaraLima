@@ -8,7 +8,11 @@ import { Buffer as NodeBuffer } from "buffer";
 import dataBr from "../functions/dataBr";
 
 // This returns a local uri that can be shared
-export default async function gerarPedidoExcel(pedido: any): Promise<string> {
+export default async function gerarPedidoExcel(
+  pedido: any,
+  listaProdutosRestaurante: any,
+  nomeRestauranteSelecionado: string
+): Promise<string> {
   // export default async function gerarPedidoExcel(pedido: any, Promise: string) {
   const now = new Date();
   const fileName = "YourFilename.xlsx";
@@ -21,6 +25,14 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
     workbook.modified = now;
     // Add a sheet to work on
     const worksheet = workbook.addWorksheet("My Sheet", {});
+
+    for (const itemPedido of pedido) {
+      for (const produto of listaProdutosRestaurante) {
+        if (itemPedido.produtoId === produto.produtoId) {
+          itemPedido.nomeProduto = produto.nome;
+        }
+      }
+    }
 
     worksheet.columns = [
       { header: "Chácara Lima", key: "quantidade", width: 5 },
@@ -40,7 +52,7 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
       quantidade: "Data:",
       produto: dataBr(pedido[0].dataPedido),
     });
-    worksheet.addRow({ quantidade: "Ideal" });
+    worksheet.addRow({ quantidade: nomeRestauranteSelecionado });
     worksheet.mergeCells("A7:D7");
     worksheet.addRow({
       quantidade: "Qt.",
@@ -57,7 +69,7 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
         valorTotal += item.quantidadeProduto * item.valorProduto;
         worksheet.addRow({
           quantidade: item.quantidadeProduto,
-          produto: item.produtoId,
+          produto: item.nomeProduto,
           valorUnidade: `R$ ${item.valorProduto.replace(".", ",")}`,
           valorTotalProduto: `R$ ${(item.quantidadeProduto * item.valorProduto)
             .toFixed(2)
@@ -79,9 +91,9 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
     worksheet.addRow({ quantidade: "" });
     worksheet.addRow({ quantidade: "" });
     worksheet.addRow({
-      quantidade: "_________________________",
+      quantidade: "_________________",
       produto: "",
-      valorUnidade: "_________________________",
+      valorUnidade: "_________________",
       valorTotalProduto: "",
     });
     worksheet.mergeCells("A40:B40");
@@ -112,7 +124,7 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
       quantidade: "Data:",
       produto: dataBr(pedido[0].dataPedido),
     });
-    worksheet.addRow({ quantidade: "Ideal" });
+    worksheet.addRow({ quantidade: nomeRestauranteSelecionado });
     worksheet.mergeCells("A51:D51");
     worksheet.addRow({
       quantidade: "Qt.",
@@ -125,7 +137,7 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
       if (item.quantidadeProduto > 0) {
         worksheet.addRow({
           quantidade: item.quantidadeProduto,
-          produto: item.produtoId,
+          produto: item.nomeProduto,
           valorUnidade: `R$ ${item.valorProduto.replace(".", ",")}`,
           valorTotalProduto: `R$ ${(item.quantidadeProduto * item.valorProduto)
             .toFixed(2)
@@ -146,9 +158,9 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
     worksheet.addRow({ quantidade: "" });
     worksheet.addRow({ quantidade: "" });
     worksheet.addRow({
-      quantidade: "_________________________",
+      quantidade: "_________________",
       produto: "",
-      valorUnidade: "_________________________",
+      valorUnidade: "_________________",
       valorTotalProduto: "",
     });
     worksheet.mergeCells("A84:B84");
@@ -198,6 +210,13 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
       worksheet.getRow(row).alignment = {
         vertical: "middle",
         horizontal: "center",
+      };
+    }
+
+    for (let row = 8; row <= 37; row++) {
+      worksheet.getRow(row).alignment = {
+        vertical: "middle",
+        horizontal: "left",
       };
     }
 
@@ -272,6 +291,13 @@ export default async function gerarPedidoExcel(pedido: any): Promise<string> {
       worksheet.getRow(row).alignment = {
         vertical: "middle",
         horizontal: "center",
+      };
+    }
+
+    for (let row = 52; row <= 81; row++) {
+      worksheet.getRow(row).alignment = {
+        vertical: "middle",
+        horizontal: "left",
       };
     }
 
