@@ -8,20 +8,9 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import {
-  Input,
-  Icon,
-  IconButton,
-  Box,
-  FormControl,
-  WarningOutlineIcon,
-} from "native-base";
 import { styles } from "../../../assets/styles/styles";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { RootTabScreenProps } from "../../../types";
 import config from "../../../config/config.json";
 import DropDownPicker from "react-native-dropdown-picker";
-import { MaterialIcons } from "@expo/vector-icons";
 
 interface TiposUsuariosDropdownList {
   label: string;
@@ -59,13 +48,7 @@ export default function EditarUsuarioScreen(props: any) {
     setMostrarButtonAutorizarRedefinicaoSenha,
   ] = useState(false);
 
-  const [senhaNova, setSenhaNova] = useState("");
-  const [senhaNovaConfirmacao, setSenhaNovaConfirmacao] = useState("");
   const [mostrarInputTrocarSenha, setMostrarInputTrocarSenha] = useState(false);
-  const [mostrarSenhaNova, setMostrarNovaSenha] = useState(false);
-  const [mostrarConfirmacaoSenhaNova, setMostrarConfirmacaoNovaSenha] =
-    useState(false);
-  const [mostrarErroUsuarioSenha, setMostrarErroUsuarioSenha] = useState(false);
 
   useEffect(() => {
     buscarDadosIniciais();
@@ -283,32 +266,6 @@ export default function EditarUsuarioScreen(props: any) {
     }
   }
 
-  async function redefinirSenha() {
-    setMostrarErroUsuarioSenha(false);
-    if (senhaNova === senhaNovaConfirmacao) {
-      const response = await fetch(config.urlRoot + "redefinirSenha", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          usuario: usuario,
-          senhaNova: senhaNova,
-        }),
-      });
-
-      let atualizadoSucesso = await response.json();
-      if (atualizadoSucesso) {
-        Alert.alert("Senha Redefinida com Sucesso!");
-        setSenhaNova("");
-        setSenhaNovaConfirmacao("");
-      }
-    } else {
-      setMostrarErroUsuarioSenha(true);
-    }
-  }
-
   const usuarioInputHandler = (valor: string) => {
     setUsuario(valor);
   };
@@ -316,11 +273,6 @@ export default function EditarUsuarioScreen(props: any) {
   const nomeInputHandler = (valor: string) => {
     setNome(valor);
   };
-
-  const mostrarSenhaNovaHandler = () => setMostrarNovaSenha(!mostrarSenhaNova);
-
-  const mostrarConfirmacaoSenhaNovaHandler = () =>
-    setMostrarConfirmacaoNovaSenha(!mostrarConfirmacaoSenhaNova);
 
   return (
     <View style={styles.container}>
@@ -411,78 +363,6 @@ export default function EditarUsuarioScreen(props: any) {
       )}
       {mostrarInputTrocarSenha == true && (
         <View style={{ marginTop: 40, alignItems: "center" }}>
-          {/* <Input
-            w={{
-              base: "95%",
-              md: "25%",
-            }}
-            type={mostrarSenhaNova ? "text" : "password"}
-            InputRightElement={
-              <IconButton
-                icon={
-                  <Icon
-                    as={
-                      <MaterialIcons
-                        name={
-                          mostrarSenhaNova ? "visibility-off" : "visibility"
-                        }
-                      />
-                    }
-                    size={5}
-                    mr="2"
-                    color="muted.400"
-                    onPress={mostrarSenhaNovaHandler}
-                  />
-                }
-              />
-            }
-            value={senhaNova}
-            onChangeText={(text) => setSenhaNova(text)}
-            placeholder="Senha Nova"
-          />
-          <View style={{ marginTop: 10 }}></View>
-          <Input
-            w={{
-              base: "95%",
-              md: "25%",
-            }}
-            type={mostrarConfirmacaoSenhaNova ? "text" : "password"}
-            InputRightElement={
-              <IconButton
-                icon={
-                  <Icon
-                    as={
-                      <MaterialIcons
-                        name={
-                          mostrarConfirmacaoSenhaNova
-                            ? "visibility-off"
-                            : "visibility"
-                        }
-                      />
-                    }
-                    size={5}
-                    mr="2"
-                    color="muted.400"
-                    onPress={mostrarConfirmacaoSenhaNovaHandler}
-                  />
-                }
-              />
-            }
-            value={senhaNovaConfirmacao}
-            onChangeText={(text) => setSenhaNovaConfirmacao(text)}
-            placeholder="Confirmar Senha Nova"
-          />
-          {mostrarErroUsuarioSenha && (
-            <Box alignItems="center">
-              <FormControl isInvalid w="100%">
-                <FormControl.ErrorMessage
-                  leftIcon={<WarningOutlineIcon size="xs" />}
-                >
-                  As senhas não estão iguais!
-                </FormControl.ErrorMessage>
-              </FormControl>
-            </Box>
-          )} */}
           <TouchableOpacity
             style={[styles.confirmaRedefinicaoSenhaContainer, { width: "40%" }]}
             onPress={() => {

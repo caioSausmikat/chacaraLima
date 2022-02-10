@@ -41,8 +41,8 @@ interface Pedido {
 }
 
 export default function ClienteScreen(props: any) {
-
   const [atualizaFlatList, setAtualizaFlatList] = useState(false);
+  const [nomeRestaurante, setNomeRestaurante] = useState("");
 
   const [mostrarProdutosRestaurante, setMostrarProdutosRestaurante] =
     useState(false);
@@ -88,6 +88,13 @@ export default function ClienteScreen(props: any) {
 
   async function buscarDadosIniciais() {
     try {
+      const buscaDadosRestauranteResponse = await buscaDadosRestaurante(
+        pedido[0].restauranteId
+      );
+      const jsonBuscaDadosRestauranteResponse =
+        await buscaDadosRestauranteResponse.json();
+      setNomeRestaurante(await jsonBuscaDadosRestauranteResponse.nome);
+
       const buscarListaProdutosRestauranteSelecionadoResponse =
         await buscarListaProdutosRestauranteSelecionado();
       const jsonBuscarListaProdutosRestauranteSelecionado =
@@ -207,7 +214,9 @@ export default function ClienteScreen(props: any) {
   }
 
   async function enviarTokenPedidoRealizado() {
-    const buscaDadosRestauranteResponse = await buscaDadosRestaurante();
+    const buscaDadosRestauranteResponse = await buscaDadosRestaurante(
+      pedido[0].restauranteId
+    );
     const jsonBuscaDadosRestauranteResponse =
       await buscaDadosRestauranteResponse.json();
 
@@ -223,14 +232,14 @@ export default function ClienteScreen(props: any) {
     );
   }
 
-  function buscaDadosRestaurante() {
+  function buscaDadosRestaurante(restauranteId: number) {
     return fetch(config.urlRoot + "buscaDadosRestaurante", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ restauranteId: pedido[0].restauranteId }),
+      body: JSON.stringify({ restauranteId: restauranteId }),
     });
   }
 
@@ -289,29 +298,41 @@ export default function ClienteScreen(props: any) {
       <View
         style={{
           flexDirection: "row",
-          marginTop: 20,
+          marginTop: 40,
           marginBottom: 20,
           justifyContent: "center",
         }}
       >
         <TouchableOpacity onPress={onPressDateHandler}>
           <Ionicons
-            style={{ color: "#418ac7", marginLeft: 20 }}
+            style={{ color: "#418ac7" }}
             name="calendar"
             size={40}
             title="Show date picker!"
           />
         </TouchableOpacity>
-        <View style={[styles.pedidosData, { width: "35%" }]}>
+        <View style={[styles.pedidosData, { width: "25%" }]}>
           <Text
             style={{
               fontWeight: "bold",
               color: "#418ac7",
               alignSelf: "center",
-              fontSize: 16,
+              fontSize: 14,
             }}
           >
             {dataBr(dataPedido)}
+          </Text>
+        </View>
+        <View style={[styles.pedidosData, { width: "50%" }]}>
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: "#418ac7",
+              alignSelf: "center",
+              fontSize: 14,
+            }}
+          >
+            {nomeRestaurante}
           </Text>
         </View>
       </View>

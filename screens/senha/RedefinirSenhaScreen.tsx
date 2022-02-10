@@ -100,6 +100,14 @@ export default function RedefinirSenhaScreen(props: any) {
       );
       props.navigation.navigate("Login");
     }
+
+    const buscaTokensResponsaveisResponse = await buscaTokensResponsaveis(
+      atualizadoSucesso
+    );
+    const jsonBuscaTokensResponsaveisResponse =
+      await buscaTokensResponsaveisResponse.json();
+
+    await enviaNotificacao(jsonBuscaTokensResponsaveisResponse);
   }
 
   function alteraIndicadorAlteracaoSenha(indicadorAlteracaoSenha: number) {
@@ -147,6 +155,36 @@ export default function RedefinirSenhaScreen(props: any) {
       setTimeout(() => {
         setMostrarErroUsuarioSenha(false);
       }, 5000);
+    }
+  }
+
+  function buscaTokensResponsaveis(atualizadoSucesso: any) {
+    return fetch(config.urlRoot + "buscaTokensResponsaveis", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+  }
+
+  function enviaNotificacao(tokens: any) {
+    for (const item of tokens) {
+      if (item.tiposUsuariosId === 1) {
+        fetch(config.urlRoot + "notifications", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            recipient: item.token,
+            title: "Redefinição de senha",
+            message: `O usuário ${usuario.toUpperCase()} solicitou redefinição de senha`,
+          }),
+        });
+      }
     }
   }
 

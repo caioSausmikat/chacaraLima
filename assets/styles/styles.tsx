@@ -127,12 +127,13 @@ const styles = StyleSheet.create({
     marginLeft: 7,
   },
   usuariosContainer: {
+    flexDirection: "row",
     padding: 10,
     borderRadius: 5,
     borderColor: "green",
     borderWidth: 1,
     margin: 3,
-    width: "75%",
+    width: "70%",
     marginLeft: 20,
   },
   adicionarUsuarioContainer: {

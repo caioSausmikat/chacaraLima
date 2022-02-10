@@ -647,7 +647,7 @@ app.post("/buscaDadosRestaurante", async (req, res) => {
 //Busca tokens de usuarios do tipo 1 e 2
 app.post("/buscaTokensResponsaveis", async (req, res) => {
   const response = await sequelize.query(
-    `SELECT B.token FROM usuarios A, tokens B WHERE (A.tiposUsuariosId = 1 OR A.tiposUsuariosId = 2) AND B.usuarioId = A.id`,
+    `SELECT B.token, A.tiposUsuariosId FROM usuarios A, tokens B WHERE (A.tiposUsuariosId = 1 OR A.tiposUsuariosId = 2) AND B.usuarioId = A.id`,
     { raw: true }
   );
   let tokens = [];
