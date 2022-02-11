@@ -105,6 +105,7 @@ export default function AlterarRestaurantesScreen({
     });
     let excluidoSucesso = await response.json();
     if (excluidoSucesso) {
+      Alert.alert("Restaurante excluído com sucesso!");
       buscarDadosBase();
     }
   }

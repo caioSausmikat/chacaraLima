@@ -152,7 +152,11 @@ function BottomTabNavigator({ route }) {
           name="Pedidos"
           component={PedidosScreen}
           initialParams={{ usuarioLogado: route.params.usuario }}
+          listeners={({ navigation }) => ({
+            blur: () => navigation.setParams({ screen: undefined }),
+          })}
           options={{
+            unmountOnBlur: true,
             headerTitle: "",
             headerTransparent: true,
             tabBarIcon: ({ focused, color, size }) => {
@@ -239,10 +243,14 @@ function BottomTabNavigator({ route }) {
           name="Usuarios"
           component={UsuariosScreen}
           initialParams={{ usuarioLogado: route.params.usuario }}
+          listeners={({ navigation }) => ({
+            blur: () => navigation.setParams({ screen: undefined }),
+          })}
           options={{
             title: "Usuarios",
             headerTitle: "",
             headerTransparent: true,
+            unmountOnBlur: true,
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
 
@@ -259,9 +267,13 @@ function BottomTabNavigator({ route }) {
           name="Pedidos"
           component={UsuarioScreen}
           initialParams={{ usuarioLogado: route.params.usuario }}
+          listeners={({ navigation }) => ({
+            blur: () => navigation.setParams({ screen: undefined }),
+          })}
           options={{
             headerTitle: "",
             headerTransparent: true,
+            unmountOnBlur: true,
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
 
@@ -278,9 +290,13 @@ function BottomTabNavigator({ route }) {
           name="Pedidos"
           component={ClienteScreen}
           initialParams={{ usuarioLogado: route.params.usuario }}
+          listeners={({ navigation }) => ({
+            blur: () => navigation.setParams({ screen: undefined }),
+          })}
           options={{
             headerTitle: "",
             headerTransparent: true,
+            unmountOnBlur: true,
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
 

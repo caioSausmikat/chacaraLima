@@ -15,7 +15,10 @@ export default async function gerarPedidoExcel(
 ): Promise<string> {
   // export default async function gerarPedidoExcel(pedido: any, Promise: string) {
   const now = new Date();
-  const fileName = "YourFilename.xlsx";
+  const fileName = `${nomeRestauranteSelecionado} - ${dataBr(
+    pedido[0].dataPedido,
+    "-"
+  )}.xlsx`;
   const fileUri = FileSystem.cacheDirectory + fileName;
 
   return new Promise<string>((resolve, reject) => {
@@ -34,11 +37,24 @@ export default async function gerarPedidoExcel(
       }
     }
 
+    worksheet.pageSetup.margins = {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      header: 0.8,
+      footer: 0.8,
+    };
+
+    worksheet.pageSetup.orientation = "portrait";
+
+    worksheet.pageSetup.printArea = "A1:D85";
+
     worksheet.columns = [
-      { header: "Chácara Lima", key: "quantidade", width: 5 },
-      { header: "", key: "produto", width: 18 },
-      { header: "", key: "valorUnidade", width: 8 },
-      { header: "", key: "valorTotalProduto", width: 8 },
+      { header: "Chácara Lima", key: "quantidade", width: 4.57 },
+      { header: "", key: "produto", width: 15.28 },
+      { header: "", key: "valorUnidade", width: 6.28 },
+      { header: "", key: "valorTotalProduto", width: 9.42 },
     ];
 
     worksheet.mergeCells("A1:D1");
@@ -50,7 +66,7 @@ export default async function gerarPedidoExcel(
     worksheet.addRow({ quantidade: "" });
     worksheet.addRow({
       quantidade: "Data:",
-      produto: dataBr(pedido[0].dataPedido),
+      produto: dataBr(pedido[0].dataPedido, "/"),
     });
     worksheet.addRow({ quantidade: nomeRestauranteSelecionado });
     worksheet.mergeCells("A7:D7");
@@ -122,7 +138,7 @@ export default async function gerarPedidoExcel(
     worksheet.addRow({ quantidade: "" });
     worksheet.addRow({
       quantidade: "Data:",
-      produto: dataBr(pedido[0].dataPedido),
+      produto: dataBr(pedido[0].dataPedido, "/"),
     });
     worksheet.addRow({ quantidade: nomeRestauranteSelecionado });
     worksheet.mergeCells("A51:D51");
@@ -213,6 +229,10 @@ export default async function gerarPedidoExcel(
       };
     }
 
+    for (let row = 9; row <= 36; row++) {
+      worksheet.getRow(row).height = 10.5;
+    }
+
     for (let row = 8; row <= 37; row++) {
       worksheet.getRow(row).alignment = {
         vertical: "middle",
@@ -294,6 +314,10 @@ export default async function gerarPedidoExcel(
       };
     }
 
+    for (let row = 53; row <= 80; row++) {
+      worksheet.getRow(row).height = 10.5;
+    }
+
     for (let row = 52; row <= 81; row++) {
       worksheet.getRow(row).alignment = {
         vertical: "middle",
@@ -336,6 +360,21 @@ export default async function gerarPedidoExcel(
         right: { style: "thin" },
       };
     }
+
+    for (let row = 1; row <= 8; row++) {
+      worksheet.getRow(row).height = 10.25;
+    }
+
+    for (let row = 37; row <= 52; row++) {
+      worksheet.getRow(row).height = 10.25;
+    }
+
+    for (let row = 81; row <= 85; row++) {
+      worksheet.getRow(row).height = 10.25;
+    }
+
+    worksheet.getRow(42).height = 5;
+    worksheet.getRow(43).height = 5;
 
     // Write to file
     workbook.xlsx.writeBuffer().then((buffer: ExcelJS.Buffer) => {

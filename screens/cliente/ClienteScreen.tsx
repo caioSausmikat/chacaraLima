@@ -61,6 +61,8 @@ export default function ClienteScreen(props: any) {
   const [show, setShow] = useState(false);
   const [showButtons, setShowButtons] = useState(true);
 
+  const [pedidoDataRestaurante, setPedidoDataRestaurante] = useState(false);
+
   const [
     mostraMensagemClienteSemRestauranteVinculado,
     setMostraMensagemClienteSemRestauranteVinculado,
@@ -143,25 +145,62 @@ export default function ClienteScreen(props: any) {
     listaProdutosRestaurante.length = 0;
     pedido.length = 0;
 
+    let quantidadeProdutosPedido = 0;
     for (const item of json) {
-      listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}${new Date()}`,
-        produtoId: item.produtoId,
-        restauranteId: item.restauranteId,
-        nome: capitalize(item.nome),
-        quantidadeProduto: item.quantidadeProduto.toString(),
-        valor: item.valorProduto.replace(".", ","),
-      });
+      if (item.quantidadeProduto === 0) {
+        quantidadeProdutosPedido++;
+      }
+      if (dataPedido === new Date().toJSON().slice(0, 10)) {
+        listaProdutosRestaurante.push({
+          key: `${item.restauranteId}${item.produtoId}${new Date()}`,
+          produtoId: item.produtoId,
+          restauranteId: item.restauranteId,
+          nome: capitalize(item.nome),
+          quantidadeProduto: item.quantidadeProduto.toString(),
+          valor: item.valorProduto.replace(".", ","),
+        });
 
-      pedido.push({
-        dataPedido: dataPedido,
-        restauranteId: item.restauranteId,
-        usuarioId: props.route.params.usuarioLogado.id,
-        nomeUsuario: props.route.params.usuarioLogado.nome,
-        produtoId: item.produtoId,
-        quantidadeProduto: item.quantidadeProduto,
-        valorProduto: item.valorProduto,
-      });
+        pedido.push({
+          dataPedido: dataPedido,
+          restauranteId: item.restauranteId,
+          usuarioId: props.route.params.usuarioLogado.id,
+          nomeUsuario: props.route.params.usuarioLogado.nome,
+          produtoId: item.produtoId,
+          quantidadeProduto: item.quantidadeProduto,
+          valorProduto: item.valorProduto,
+        });
+      } else {
+        if (item.quantidadeProduto > 0) {
+          listaProdutosRestaurante.push({
+            key: `${item.restauranteId}${item.produtoId}${new Date()}`,
+            produtoId: item.produtoId,
+            restauranteId: item.restauranteId,
+            nome: capitalize(item.nome),
+            quantidadeProduto: item.quantidadeProduto.toString(),
+            valor: item.valorProduto.replace(".", ","),
+          });
+
+          pedido.push({
+            dataPedido: dataPedido,
+            restauranteId: item.restauranteId,
+            usuarioId: props.route.params.usuarioLogado.id,
+            nomeUsuario: props.route.params.usuarioLogado.nome,
+            produtoId: item.produtoId,
+            quantidadeProduto: item.quantidadeProduto,
+            valorProduto: item.valorProduto,
+          });
+        }
+      }
+
+      if (quantidadeProdutosPedido === json.length) {
+        if (dataPedido !== new Date().toJSON().slice(0, 10)) {
+          listaProdutosRestaurante.length = 0;
+          pedido.length = 0;
+        }
+        setPedidoDataRestaurante(false);
+      } else {
+        setPedidoDataRestaurante(true);
+      }
     }
 
     setAtualizaFlatList(!atualizaFlatList);
@@ -320,7 +359,7 @@ export default function ClienteScreen(props: any) {
               fontSize: 14,
             }}
           >
-            {dataBr(dataPedido)}
+            {dataBr(dataPedido, "/")}
           </Text>
         </View>
         <View style={[styles.pedidosData, { width: "50%" }]}>
@@ -364,7 +403,7 @@ export default function ClienteScreen(props: any) {
         />
       )}
 
-      {listaProdutosRestaurante.length === 0 && (
+      {listaProdutosRestaurante.length === 0 && pedidoDataRestaurante == false && (
         <View style={styles.mensagemSemPedidoContainer}>
           <Text style={styles.mensageSemPedidoText}>
             Nenhum pedido encontrado na data selecionada.

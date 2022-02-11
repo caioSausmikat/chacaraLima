@@ -81,6 +81,10 @@ export default function PedidosScreen(props: any) {
 
   const [expoPushToken, setExpoPushToken] = useState(null);
 
+  const [pedidoDataRestaurante, setPedidoDataRestaurante] = useState(false);
+
+  const [nomeUsuarioPedido, setNomeUsuarioPedido] = useState("");
+
   useEffect(() => {
     Keyboard.addListener("keyboardDidShow", () => {
       setShowButtons(false); // or some other action
@@ -192,7 +196,17 @@ export default function PedidosScreen(props: any) {
     listaProdutosRestaurante.length = 0;
     pedido.length = 0;
 
+    let quantidadeProdutosPedido = 0;
+    setNomeUsuarioPedido("");
     for (const item of json) {
+      if (item.quantidadeProduto > 0) {
+        setNomeUsuarioPedido(item.nomeUsuario);
+      }
+
+      if (item.quantidadeProduto === 0) {
+        quantidadeProdutosPedido++;
+      }
+
       listaProdutosRestaurante.push({
         key: `${item.restauranteId}${item.produtoId}${new Date()}`,
         produtoId: item.produtoId,
@@ -201,6 +215,12 @@ export default function PedidosScreen(props: any) {
         quantidadeProduto: item.quantidadeProduto.toString(),
         valor: item.valorProduto.replace(".", ","),
       });
+
+      if (quantidadeProdutosPedido === json.length) {
+        setPedidoDataRestaurante(false);
+      } else {
+        setPedidoDataRestaurante(true);
+      }
 
       pedido.push({
         dataPedido: dataPedido,
@@ -237,6 +257,17 @@ export default function PedidosScreen(props: any) {
           item.quantidadeProduto = Number(novaQuantidade);
         }
       }
+    }
+    let quantidadeProdutosPedido = 0;
+    for (const item of pedido) {
+      if (item.quantidadeProduto === 0) {
+        quantidadeProdutosPedido++;
+      }
+    }
+    if (quantidadeProdutosPedido === pedido.length) {
+      setPedidoDataRestaurante(false);
+    } else {
+      setPedidoDataRestaurante(true);
     }
   }
 
@@ -344,13 +375,28 @@ export default function PedidosScreen(props: any) {
 
   return (
     <View style={styles.container}>
+      {pedido.length > 0 && nomeUsuarioPedido !== "" && (
+        <View style={{ justifyContent: "center", marginTop: 10 }}>
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: "#418ac7",
+              alignSelf: "center",
+              fontSize: 16,
+            }}
+          >
+            Última modificação feita por {nomeUsuarioPedido}
+          </Text>
+        </View>
+      )}
       {mostrarListaRestaurantes == true && (
         <View
-          style={
+          style={[
             Platform.OS === "ios"
-              ? { zIndex: 3000, flexDirection: "row", marginTop: 40 }
-              : { flexDirection: "row", marginTop: 40 }
-          }
+              ? { zIndex: 3000, flexDirection: "row" }
+              : { flexDirection: "row" },
+            nomeUsuarioPedido !== "" ? { marginTop: 13 } : { marginTop: 40 },
+          ]}
         >
           <TouchableOpacity onPress={onPressDateHandler}>
             <Ionicons
@@ -369,7 +415,7 @@ export default function PedidosScreen(props: any) {
                 fontSize: 14,
               }}
             >
-              {dataBr(dataPedido)}
+              {dataBr(dataPedido, "/")}
             </Text>
           </View>
 
@@ -418,14 +464,6 @@ export default function PedidosScreen(props: any) {
         />
       )}
 
-      {listaProdutosRestaurante.length === 0 && (
-        <View style={styles.mensagemSemPedidoContainer}>
-          <Text style={styles.mensageSemPedidoText}>
-            Nenhum pedido encontrado na data e no restaurante selecionado.
-          </Text>
-        </View>
-      )}
-
       {showButtons == true && (
         <View
           style={{
@@ -447,7 +485,7 @@ export default function PedidosScreen(props: any) {
             </TouchableOpacity>
           )}
 
-          {pedido.length > 0 && (
+          {pedido.length > 0 && pedidoDataRestaurante == true && (
             <TouchableOpacity
               style={styles.gerarExcelButton}
               onPress={() => {
@@ -461,16 +499,18 @@ export default function PedidosScreen(props: any) {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            style={styles.buscaPedidoButton}
-            onPress={() => {
-              salvarPedido();
-            }}
-          >
-            <Text style={styles.confirmaRedefinicaoSenhaText}>
-              Salvar Pedido
-            </Text>
-          </TouchableOpacity>
+          {pedido.length > 0 && pedidoDataRestaurante == true && (
+            <TouchableOpacity
+              style={styles.buscaPedidoButton}
+              onPress={() => {
+                salvarPedido();
+              }}
+            >
+              <Text style={styles.confirmaRedefinicaoSenhaText}>
+                Salvar Pedido
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </View>

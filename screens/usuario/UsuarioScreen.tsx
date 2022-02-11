@@ -6,6 +6,7 @@ import {
   Alert,
   Text,
   Platform,
+  Image,
 } from "react-native";
 import { styles } from "../../assets/styles/styles";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -16,8 +17,10 @@ import capitalize from "../../functions/capitalize";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import dataBr from "../../functions/dataBr";
+import gerarPedidoExcel from "../../functions/gerarPedidoExcel";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
+import * as Sharing from "expo-sharing";
 
 interface RestauranteDropdownList {
   label: string;
@@ -77,6 +80,10 @@ export default function UsuarioScreen(props: any) {
   const [showButtons, setShowButtons] = useState(true);
 
   const [expoPushToken, setExpoPushToken] = useState(null);
+
+  const [pedidoDataRestaurante, setPedidoDataRestaurante] = useState(false);
+
+  const [nomeUsuarioPedido, setNomeUsuarioPedido] = useState("");
 
   useEffect(() => {
     Keyboard.addListener("keyboardDidShow", () => {
@@ -189,7 +196,16 @@ export default function UsuarioScreen(props: any) {
     listaProdutosRestaurante.length = 0;
     pedido.length = 0;
 
+    let quantidadeProdutosPedido = 0;
+    setNomeUsuarioPedido("");
     for (const item of json) {
+      if (item.quantidadeProduto > 0) {
+        setNomeUsuarioPedido(item.nomeUsuario);
+      }
+
+      if (item.quantidadeProduto === 0) {
+        quantidadeProdutosPedido++;
+      }
       listaProdutosRestaurante.push({
         key: `${item.restauranteId}${item.produtoId}${new Date()}`,
         produtoId: item.produtoId,
@@ -208,6 +224,16 @@ export default function UsuarioScreen(props: any) {
         quantidadeProduto: item.quantidadeProduto,
         valorProduto: item.valorProduto,
       });
+
+      if (quantidadeProdutosPedido === json.length) {
+        if (dataPedido !== new Date().toJSON().slice(0, 10)) {
+          listaProdutosRestaurante.length = 0;
+          pedido.length = 0;
+        }
+        setPedidoDataRestaurante(false);
+      } else {
+        setPedidoDataRestaurante(true);
+      }
     }
 
     setAtualizaFlatList(!atualizaFlatList);
@@ -234,6 +260,17 @@ export default function UsuarioScreen(props: any) {
           item.quantidadeProduto = Number(novaQuantidade);
         }
       }
+    }
+    let quantidadeProdutosPedido = 0;
+    for (const item of pedido) {
+      if (item.quantidadeProduto === 0) {
+        quantidadeProdutosPedido++;
+      }
+    }
+    if (quantidadeProdutosPedido === pedido.length) {
+      setPedidoDataRestaurante(false);
+    } else {
+      setPedidoDataRestaurante(true);
     }
   }
 
@@ -317,15 +354,52 @@ export default function UsuarioScreen(props: any) {
     setShow(!show);
   };
 
+  async function shareExcel() {
+    let nomeRestauranteSelecionado = "";
+    for (const restaurante of listaRestaurantes) {
+      if (restaurante.value === codigoRestauranteSelecionado)
+        [(nomeRestauranteSelecionado = restaurante.label)];
+    }
+
+    const shareableExcelUri: string = await gerarPedidoExcel(
+      pedido,
+      listaProdutosRestaurante,
+      nomeRestauranteSelecionado
+    );
+    Sharing.shareAsync(shareableExcelUri, {
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
+      dialogTitle: "Your dialog title here", // Android and Web
+      UTI: "com.microsoft.excel.xlsx", // iOS
+    }).catch((error) => {
+      console.error("Error", error);
+    });
+  }
+
   return (
     <View style={styles.container}>
+      {pedido.length > 0 && nomeUsuarioPedido !== "" && (
+        <View style={{ justifyContent: "center", marginTop: 10 }}>
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: "#418ac7",
+              alignSelf: "center",
+              fontSize: 16,
+            }}
+          >
+            Última modificação feita por {nomeUsuarioPedido}
+          </Text>
+        </View>
+      )}
       {mostrarListaRestaurantes == true && (
         <View
-          style={
+          style={[
             Platform.OS === "ios"
-              ? { zIndex: 3000, flexDirection: "row", marginTop: 40 }
-              : { flexDirection: "row", marginTop: 40 }
-          }
+              ? { zIndex: 3000, flexDirection: "row" }
+              : { flexDirection: "row" },
+            nomeUsuarioPedido !== "" ? { marginTop: 13 } : { marginTop: 40 },
+          ]}
         >
           <TouchableOpacity onPress={onPressDateHandler}>
             <Ionicons
@@ -344,7 +418,7 @@ export default function UsuarioScreen(props: any) {
                 fontSize: 14,
               }}
             >
-              {dataBr(dataPedido)}
+              {dataBr(dataPedido, "/")}
             </Text>
           </View>
 
@@ -394,15 +468,16 @@ export default function UsuarioScreen(props: any) {
         />
       )}
 
-      {listaProdutosRestaurante.length === 0 && (
-        <View style={styles.mensagemSemPedidoContainer}>
-          <Text style={styles.mensageSemPedidoText}>
-            Nenhum pedido encontrado na data e no restaurante selecionado.
-          </Text>
-        </View>
-      )}
+      {dataPedido !== new Date().toJSON().slice(0, 10) &&
+        pedidoDataRestaurante == false && (
+          <View style={styles.mensagemSemPedidoContainer}>
+            <Text style={styles.mensageSemPedidoText}>
+              Nenhum pedido encontrado na data e no restaurante selecionado.
+            </Text>
+          </View>
+        )}
 
-      {showButtons == true && dataPedido === new Date().toJSON().slice(0, 10) && (
+      {showButtons == true && (
         <View
           style={{
             flexDirection: "row",
@@ -410,26 +485,46 @@ export default function UsuarioScreen(props: any) {
             height: "15%",
           }}
         >
-          <TouchableOpacity
-            style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}
-            onPress={() => {
-              atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-            }}
-          >
-            <Text style={styles.confirmaRedefinicaoSenhaText}>
-              Buscar Pedido
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.buscaPedidoButton}
-            onPress={() => {
-              salvarPedido();
-            }}
-          >
-            <Text style={styles.confirmaRedefinicaoSenhaText}>
-              Salvar Pedido
-            </Text>
-          </TouchableOpacity>
+          {dataPedido === new Date().toJSON().slice(0, 10) && (
+            <TouchableOpacity
+              style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}
+              onPress={() => {
+                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+              }}
+            >
+              <Text style={styles.confirmaRedefinicaoSenhaText}>
+                Buscar Pedido
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {pedido.length > 0 && pedidoDataRestaurante == true && (
+            <TouchableOpacity
+              style={styles.gerarExcelButton}
+              onPress={() => {
+                shareExcel();
+              }}
+            >
+              <Image
+                style={{ width: 50, height: 50 }}
+                source={require("../../assets/images/excel.icon.jpg")}
+              />
+            </TouchableOpacity>
+          )}
+
+          {dataPedido === new Date().toJSON().slice(0, 10) &&
+            pedidoDataRestaurante == true && (
+              <TouchableOpacity
+                style={styles.buscaPedidoButton}
+                onPress={() => {
+                  salvarPedido();
+                }}
+              >
+                <Text style={styles.confirmaRedefinicaoSenhaText}>
+                  Salvar Pedido
+                </Text>
+              </TouchableOpacity>
+            )}
         </View>
       )}
     </View>
