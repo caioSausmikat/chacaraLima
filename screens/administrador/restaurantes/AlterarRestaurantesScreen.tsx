@@ -169,6 +169,7 @@ export default function AlterarRestaurantesScreen({
           data={listaRestaurantes}
           keyExtractor={(item) => item.restauranteId.toString()}
           extraData={atualizaFlatList}
+          removeClippedSubviews={false}
           renderItem={(itemData) => (
             <AlterarRestaurantesItemScreen
               itemRestaurante={itemData.item}

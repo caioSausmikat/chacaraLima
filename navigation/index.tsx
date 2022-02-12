@@ -21,6 +21,7 @@ import RestaurantesScreen from "../screens/administrador/restaurantes/Restaurant
 import ProdutosScreen from "../screens/administrador/produtos/ProdutosScreen";
 import AlterarRestaurantesScreen from "../screens/administrador/restaurantes/AlterarRestaurantesScreen";
 import UsuariosScreen from "../screens/administrador/usuarios/UsuariosScreen";
+import RelatoriosScreen from "../screens/administrador/relatorios/RelatoriosScreen";
 import EditarUsuarioScreen from "../screens/administrador/usuarios/EditarUsuarioScreen";
 import RedefinirSenhaScreen from "../screens/senha/RedefinirSenhaScreen";
 import RedefinirPropriaSenhaScreen from "../screens/senha/RedefinirPropriaSenhaScreen";
@@ -255,6 +256,25 @@ function BottomTabNavigator({ route }) {
               let iconName;
 
               iconName = focused ? "people-sharp" : "people-outline";
+
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          }}
+        />
+      )}
+      {route.params.usuario.tiposUsuariosId === 1 && (
+        <BottomTab.Screen
+          name="Relatorios"
+          component={RelatoriosScreen}
+          initialParams={{ usuarioLogado: route.params.usuario }}
+          options={{
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+
+              iconName = focused ? "book" : "book-outline";
 
               // You can return any component that you like here!
               return <Ionicons name={iconName} size={size} color={color} />;

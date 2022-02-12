@@ -108,6 +108,7 @@ export default function UsuariosScreen(props: any) {
     });
     let excluidoSucesso = await response.json();
     if (excluidoSucesso) {
+      Alert.alert("Usuário excluído com sucesso!");
       buscarDadosBase();
     }
   }
@@ -156,6 +157,7 @@ export default function UsuariosScreen(props: any) {
         <FlatList
           data={listaUsuarios}
           keyExtractor={(item) => item.usuarioId.toString()}
+          removeClippedSubviews={false}
           extraData={atualizaFlatList}
           renderItem={(itemData) => (
             <UsuariosItemScreen

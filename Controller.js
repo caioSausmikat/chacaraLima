@@ -644,6 +644,20 @@ app.post("/buscaDadosRestaurante", async (req, res) => {
   res.send(JSON.stringify(response));
 });
 
+//Gera relatorio de restaurante em determinado periodo
+app.post("/geraRelatorio", async (req, res) => {
+  const response = await sequelize.query(
+    `SELECT A.produtoId, A.restauranteId, B.nome, SUM(A.quantidadeProduto) AS quantidadeProduto, A.valorProduto, SUM(A.quantidadeProduto * A.valorProduto) AS valorTotalProduto FROM pedidos A, produtos B WHERE A.dataPedido between '${dataInicio}' AND '${dataFim}' AND A.restauranteId = ${restauranteId} AND A.produtoId = B.id GROUP BY A.produtoId`,
+    { raw: true }
+  );
+
+  let relatorioResponse = [];
+  for (const itemRestaurante of response[0]) {
+    relatorioResponse.push(itemRestaurante);
+  }
+  res.send(JSON.stringify(relatorioResponse));
+});
+
 //Busca tokens de usuarios do tipo 1 e 2
 app.post("/buscaTokensResponsaveis", async (req, res) => {
   const response = await sequelize.query(

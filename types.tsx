@@ -36,6 +36,7 @@ export type RootTabParamList = {
   Restaurantes: undefined;
   Produtos: undefined;
   Usuarios: undefined;
+  Relatorios: undefined;
   RedefinirPropriaSenha: undefined;
 };
 

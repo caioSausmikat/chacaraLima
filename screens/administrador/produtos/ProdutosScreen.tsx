@@ -17,6 +17,7 @@ import capitalize from "../../../functions/capitalize";
 import { color } from "native-base/lib/typescript/theme/styled-system";
 
 interface Produto {
+  key: string;
   produtoId: number;
   nome: string;
   ativo: number;
@@ -61,6 +62,7 @@ export default function ProdutosScreen({
     listaProdutos.length = 0;
     for (const produto of listaProdutosJson) {
       listaProdutos.push({
+        key: `${produto.id}${new Date()}`,
         produtoId: produto.id,
         nome: capitalize(produto.nome),
         ativo: produto.ativo,
@@ -104,6 +106,7 @@ export default function ProdutosScreen({
     let excluidoSucesso = await response.json();
     if (excluidoSucesso) {
       buscarDadosBase();
+      Alert.alert("Produto excluído com sucesso!");
     }
   }
 
@@ -161,20 +164,18 @@ export default function ProdutosScreen({
   return (
     <View style={styles.container}>
       <View style={{ marginTop: 40 }}></View>
-      {mostrarProdutos == true && (
-        <FlatList
-          data={listaProdutos}
-          keyExtractor={(item) => item.produtoId.toString()}
-          extraData={atualizaFlatList}
-          renderItem={(itemData) => (
-            <ProdutosItemScreen
-              itemProduto={itemData.item}
-              onDelete={excluirProdutoConfirmacao}
-              onUpdate={alterarProdutoHandler}
-            />
-          )}
-        />
-      )}
+      <FlatList
+        data={listaProdutos}
+        extraData={atualizaFlatList}
+        removeClippedSubviews={false}
+        renderItem={(itemData) => (
+          <ProdutosItemScreen
+            itemProduto={itemData.item}
+            onDelete={excluirProdutoConfirmacao}
+            onUpdate={alterarProdutoHandler}
+          />
+        )}
+      />
       <View style={[styles.incluirProdutoContainer]}>
         <View style={styles.adicionarProdutoContainer}>
           <TextInput

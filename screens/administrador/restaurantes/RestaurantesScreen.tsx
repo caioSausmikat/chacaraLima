@@ -267,6 +267,7 @@ export default function RestaurantesScreen({
     });
     let excluidoSucesso = await response.json();
     if (excluidoSucesso) {
+      Alert.alert("Restaurante excluído com sucesso!");
       atualizaProdutosRestaurante(restauranteId);
     }
   }

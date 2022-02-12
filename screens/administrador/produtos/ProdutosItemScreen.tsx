@@ -18,7 +18,7 @@ export default function ProdutosItemScreen(props: any) {
         <TextInput
           value={nomeProduto}
           onChangeText={nomeInputHandler}
-          onBlur={props.onUpdate.bind(
+          onEndEditing={props.onUpdate.bind(
             props,
             props.itemProduto.produtoId,
             props.itemProduto.nome,

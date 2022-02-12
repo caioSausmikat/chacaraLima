@@ -95,7 +95,6 @@ export default function PedidosScreen(props: any) {
 
     registerForPushNotificationsAsync();
     buscarDadosIniciais();
-    console.log(new Date());
   }, []);
 
   useEffect(() => {

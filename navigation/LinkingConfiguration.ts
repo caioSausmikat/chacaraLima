@@ -35,6 +35,11 @@ const linking: LinkingOptions<RootStackParamList> = {
               UsuariosScreen: "usuarios",
             },
           },
+          Relatorios: {
+            screens: {
+              RelatoriosScreen: "relatorios",
+            },
+          },
         },
       },
       Usuario: "Usuario",
