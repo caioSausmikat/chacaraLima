@@ -87,8 +87,7 @@ export default function PedidosScreen(props: any) {
 
   useEffect(() => {
     console.log(
-      new Date().toLocaleString("pt-BR", {
-        dateStyle: "full",
+      new Date().toLocaleString("en-CA", {
         timeZone: "America/Sao_Paulo",
       })
     );
