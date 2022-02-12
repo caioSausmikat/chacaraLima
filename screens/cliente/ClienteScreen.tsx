@@ -52,12 +52,20 @@ export default function ClienteScreen(props: any) {
   >([]);
 
   const [dataPedido, setDataPedido] = useState(
-    new Date().toJSON().slice(0, 10)
+    new Date()
+      .toLocaleString("en-CA", {
+        timeZone: "America/Sao_Paulo",
+      })
+      .slice(0, 10)
   );
 
   const [pedido, setPedido] = useState<Pedido[]>([]);
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(
+    new Date().toLocaleString("en-CA", {
+      timeZone: "America/Sao_Paulo",
+    })
+  );
   const [show, setShow] = useState(false);
   const [showButtons, setShowButtons] = useState(true);
 
@@ -150,9 +158,20 @@ export default function ClienteScreen(props: any) {
       if (item.quantidadeProduto === 0) {
         quantidadeProdutosPedido++;
       }
-      if (dataPedido === new Date().toJSON().slice(0, 10)) {
+      if (
+        dataPedido ===
+        new Date()
+          .toLocaleString("en-CA", {
+            timeZone: "America/Sao_Paulo",
+          })
+          .slice(0, 10)
+      ) {
         listaProdutosRestaurante.push({
-          key: `${item.restauranteId}${item.produtoId}${new Date()}`,
+          key: `${item.restauranteId}${
+            item.produtoId
+          }${new Date().toLocaleString("en-CA", {
+            timeZone: "America/Sao_Paulo",
+          })}`,
           produtoId: item.produtoId,
           restauranteId: item.restauranteId,
           nome: capitalize(item.nome),
@@ -172,7 +191,11 @@ export default function ClienteScreen(props: any) {
       } else {
         if (item.quantidadeProduto > 0) {
           listaProdutosRestaurante.push({
-            key: `${item.restauranteId}${item.produtoId}${new Date()}`,
+            key: `${item.restauranteId}${
+              item.produtoId
+            }${new Date().toLocaleString("en-CA", {
+              timeZone: "America/Sao_Paulo",
+            })}`,
             produtoId: item.produtoId,
             restauranteId: item.restauranteId,
             nome: capitalize(item.nome),
@@ -193,7 +216,14 @@ export default function ClienteScreen(props: any) {
       }
 
       if (quantidadeProdutosPedido === json.length) {
-        if (dataPedido !== new Date().toJSON().slice(0, 10)) {
+        if (
+          dataPedido !==
+          new Date()
+            .toLocaleString("en-CA", {
+              timeZone: "America/Sao_Paulo",
+            })
+            .slice(0, 10)
+        ) {
           listaProdutosRestaurante.length = 0;
           pedido.length = 0;
         }
@@ -411,26 +441,32 @@ export default function ClienteScreen(props: any) {
         </View>
       )}
 
-      {showButtons == true && dataPedido === new Date().toJSON().slice(0, 10) && (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            height: "15%",
-          }}
-        >
-          <TouchableOpacity
-            style={styles.buscaPedidoButton}
-            onPress={() => {
-              salvarPedido();
+      {showButtons == true &&
+        dataPedido ===
+          new Date()
+            .toLocaleString("en-CA", {
+              timeZone: "America/Sao_Paulo",
+            })
+            .slice(0, 10) && (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              height: "15%",
             }}
           >
-            <Text style={styles.confirmaRedefinicaoSenhaText}>
-              Salvar Pedido
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+            <TouchableOpacity
+              style={styles.buscaPedidoButton}
+              onPress={() => {
+                salvarPedido();
+              }}
+            >
+              <Text style={styles.confirmaRedefinicaoSenhaText}>
+                Salvar Pedido
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
     </View>
   );
 }

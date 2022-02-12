@@ -173,7 +173,12 @@ export default function RestaurantesScreen({
     listaProdutosRestaurante.length = 0;
     for (const item of json) {
       listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}${new Date()}`,
+        key: `${item.restauranteId}${item.produtoId}${new Date().toLocaleString(
+          "en-CA",
+          {
+            timeZone: "America/Sao_Paulo",
+          }
+        )}`,
         produtoId: item.produtoId,
         restauranteId: item.restauranteId,
         nome: capitalize(item.Produto.nome),

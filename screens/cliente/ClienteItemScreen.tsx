@@ -25,7 +25,12 @@ export default function ClienteItemScreen(props: any) {
       </View>
       <View
         style={
-          props.dataPedido === new Date().toJSON().slice(0, 10)
+          props.dataPedido ===
+          new Date()
+            .toLocaleString("en-CA", {
+              timeZone: "America/Sao_Paulo",
+            })
+            .slice(0, 10)
             ? [
                 styles.produtosValorContainer,
                 { width: "15%", borderColor: "green" },
@@ -36,7 +41,12 @@ export default function ClienteItemScreen(props: any) {
               ]
         }
       >
-        {props.dataPedido === new Date().toJSON().slice(0, 10) && (
+        {props.dataPedido ===
+          new Date()
+            .toLocaleString("en-CA", {
+              timeZone: "America/Sao_Paulo",
+            })
+            .slice(0, 10) && (
           <TextInput
             caretHidden={true}
             onFocus={() => {
@@ -61,9 +71,12 @@ export default function ClienteItemScreen(props: any) {
             )}
           />
         )}
-        {props.dataPedido !== new Date().toJSON().slice(0, 10) && (
-          <Text>{quantidadeProduto}</Text>
-        )}
+        {props.dataPedido !==
+          new Date()
+            .toLocaleString("en-CA", {
+              timeZone: "America/Sao_Paulo",
+            })
+            .slice(0, 10) && <Text>{quantidadeProduto}</Text>}
       </View>
       <View style={[styles.produtosValorContainer, { borderColor: "gray" }]}>
         <Text>R$ {valorProduto}</Text>

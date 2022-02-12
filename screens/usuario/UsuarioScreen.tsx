@@ -70,12 +70,14 @@ export default function UsuarioScreen(props: any) {
   >([]);
 
   const [dataPedido, setDataPedido] = useState(
-    new Date().toJSON().slice(0, 10)
+    new Date().toLocaleString("en-CA", {
+    timeZone: "America/Sao_Paulo"}).slice(0, 10)
   );
 
   const [pedido, setPedido] = useState<Pedido[]>([]);
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date().toLocaleString("en-CA", {
+    timeZone: "America/Sao_Paulo"}));
   const [show, setShow] = useState(false);
   const [showButtons, setShowButtons] = useState(true);
 
@@ -207,7 +209,8 @@ export default function UsuarioScreen(props: any) {
         quantidadeProdutosPedido++;
       }
       listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}${new Date()}`,
+        key: `${item.restauranteId}${item.produtoId}${new Date().toLocaleString("en-CA", {
+    timeZone: "America/Sao_Paulo"})}`,
         produtoId: item.produtoId,
         restauranteId: item.restauranteId,
         nome: capitalize(item.nome),
@@ -226,7 +229,8 @@ export default function UsuarioScreen(props: any) {
       });
 
       if (quantidadeProdutosPedido === json.length) {
-        if (dataPedido !== new Date().toJSON().slice(0, 10)) {
+        if (dataPedido !== new Date().toLocaleString("en-CA", {
+    timeZone: "America/Sao_Paulo"}).slice(0, 10)) {
           listaProdutosRestaurante.length = 0;
           pedido.length = 0;
         }
@@ -468,7 +472,8 @@ export default function UsuarioScreen(props: any) {
         />
       )}
 
-      {dataPedido !== new Date().toJSON().slice(0, 10) &&
+      {dataPedido !== new Date().toLocaleString("en-CA", {
+    timeZone: "America/Sao_Paulo"}).slice(0, 10) &&
         pedidoDataRestaurante == false && (
           <View style={styles.mensagemSemPedidoContainer}>
             <Text style={styles.mensageSemPedidoText}>
@@ -485,7 +490,8 @@ export default function UsuarioScreen(props: any) {
             height: "15%",
           }}
         >
-          {dataPedido === new Date().toJSON().slice(0, 10) && (
+          {dataPedido === new Date().toLocaleString("en-CA", {
+    timeZone: "America/Sao_Paulo"}).slice(0, 10) && (
             <TouchableOpacity
               style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}
               onPress={() => {
@@ -512,7 +518,8 @@ export default function UsuarioScreen(props: any) {
             </TouchableOpacity>
           )}
 
-          {dataPedido === new Date().toJSON().slice(0, 10) &&
+          {dataPedido === new Date().toLocaleString("en-CA", {
+    timeZone: "America/Sao_Paulo"}.slice(0, 10) &&
             pedidoDataRestaurante == true && (
               <TouchableOpacity
                 style={styles.buscaPedidoButton}

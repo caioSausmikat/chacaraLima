@@ -61,13 +61,31 @@ export default function RelatoriosScreen(props: any) {
   >([]);
 
   const [dataInicio, setDataInicio] = useState(
-    new Date().toJSON().slice(0, 10)
+    new Date()
+      .toLocaleString("en-CA", {
+        timeZone: "America/Sao_Paulo",
+      })
+      .slice(0, 10)
   );
 
-  const [dataFim, setDataFim] = useState(new Date().toJSON().slice(0, 10));
+  const [dataFim, setDataFim] = useState(
+    new Date()
+      .toLocaleString("en-CA", {
+        timeZone: "America/Sao_Paulo",
+      })
+      .slice(0, 10)
+  );
 
-  const [dateInicio, setDateInicio] = useState(new Date());
-  const [dateFim, setDateFim] = useState(new Date());
+  const [dateInicio, setDateInicio] = useState(
+    new Date().toLocaleString("en-CA", {
+      timeZone: "America/Sao_Paulo",
+    })
+  );
+  const [dateFim, setDateFim] = useState(
+    new Date().toLocaleString("en-CA", {
+      timeZone: "America/Sao_Paulo",
+    })
+  );
   const [showDatePickerDataInicio, setShowDatePickerDataInicio] =
     useState(false);
   const [showDatePickerDataFim, setShowDatePickerDataFim] = useState(false);
@@ -178,7 +196,12 @@ export default function RelatoriosScreen(props: any) {
       }
 
       listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}${new Date()}`,
+        key: `${item.restauranteId}${item.produtoId}${new Date().toLocaleString(
+          "en-CA",
+          {
+            timeZone: "America/Sao_Paulo",
+          }
+        )}`,
         produtoId: item.produtoId,
         restauranteId: item.restauranteId,
         nome: capitalize(item.nome),
