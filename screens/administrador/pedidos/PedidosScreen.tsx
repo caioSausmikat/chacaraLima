@@ -70,11 +70,7 @@ export default function PedidosScreen(props: any) {
   >([]);
 
   const [dataPedido, setDataPedido] = useState(
-    new Date().toLocaleString("pt-BR", {
-      dateStyle: "full",
-      timeZone: "America/Sao_Paulo",
-    })
-    // .slice(0, 10)
+    new Date().toJSON().slice(0, 10)
   );
 
   const [pedido, setPedido] = useState<Pedido[]>([]);
@@ -90,7 +86,12 @@ export default function PedidosScreen(props: any) {
   const [nomeUsuarioPedido, setNomeUsuarioPedido] = useState("");
 
   useEffect(() => {
-    console.log(dataPedido);
+    console.log(
+      new Date().toLocaleString("pt-BR", {
+        dateStyle: "full",
+        timeZone: "America/Sao_Paulo",
+      })
+    );
     Keyboard.addListener("keyboardDidShow", () => {
       setShowButtons(false); // or some other action
     });

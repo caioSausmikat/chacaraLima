@@ -647,7 +647,7 @@ app.post("/buscaDadosRestaurante", async (req, res) => {
 //Gera relatorio de restaurante em determinado periodo
 app.post("/geraRelatorio", async (req, res) => {
   const response = await sequelize.query(
-    `SELECT A.produtoId, A.restauranteId, B.nome, SUM(A.quantidadeProduto) AS quantidadeProduto, A.valorProduto, SUM(A.quantidadeProduto * A.valorProduto) AS valorTotalProduto FROM pedidos A, produtos B WHERE A.dataPedido between '${dataInicio}' AND '${dataFim}' AND A.restauranteId = ${restauranteId} AND A.produtoId = B.id GROUP BY A.produtoId`,
+    `SELECT A.produtoId, A.restauranteId, B.nome, SUM(A.quantidadeProduto) AS quantidadeProduto, A.valorProduto, SUM(A.quantidadeProduto * A.valorProduto) AS valorTotalProduto FROM pedidos A, produtos B WHERE A.dataPedido between '${req.body.dataInicio}' AND '${req.body.dataFim}' AND A.restauranteId = ${req.body.restauranteId} AND A.produtoId = B.id GROUP BY A.produtoId`,
     { raw: true }
   );
 
