@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Text, View, TextInput } from "react-native";
 import { styles } from "../../assets/styles/styles";
+import moment from "moment";
 
 export default function ClienteItemScreen(props: any) {
   const [quantidadeProduto, setQuantidadeProduto] = useState(
@@ -26,11 +27,7 @@ export default function ClienteItemScreen(props: any) {
       <View
         style={
           props.dataPedido ===
-          new Date()
-            .toLocaleString("en-CA", {
-              timeZone: "America/Sao_Paulo",
-            })
-            .slice(0, 10)
+          moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10)
             ? [
                 styles.produtosValorContainer,
                 { width: "15%", borderColor: "green" },
@@ -42,11 +39,7 @@ export default function ClienteItemScreen(props: any) {
         }
       >
         {props.dataPedido ===
-          new Date()
-            .toLocaleString("en-CA", {
-              timeZone: "America/Sao_Paulo",
-            })
-            .slice(0, 10) && (
+          moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10) && (
           <TextInput
             caretHidden={true}
             onFocus={() => {
@@ -72,11 +65,9 @@ export default function ClienteItemScreen(props: any) {
           />
         )}
         {props.dataPedido !==
-          new Date()
-            .toLocaleString("en-CA", {
-              timeZone: "America/Sao_Paulo",
-            })
-            .slice(0, 10) && <Text>{quantidadeProduto}</Text>}
+          moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10) && (
+          <Text>{quantidadeProduto}</Text>
+        )}
       </View>
       <View style={[styles.produtosValorContainer, { borderColor: "gray" }]}>
         <Text>R$ {valorProduto}</Text>

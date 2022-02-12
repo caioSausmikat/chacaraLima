@@ -3,16 +3,6 @@ import { Text, View, TextInput } from "react-native";
 import { styles } from "../../../assets/styles/styles";
 
 export default function RelatoriosItemScreen(props: any) {
-  const [quantidadeProduto, setQuantidadeProduto] = useState(
-    props.itemProduto.quantidadeProduto
-  );
-  const [valorProduto, setValorProduto] = useState(props.itemProduto.valor);
-  const [valorProdutoAnterior, setValorProdutoAnterior] = useState("");
-
-  const quantidadeInputHandler = (valor: string) => {
-    setQuantidadeProduto(valor.replace(/[^0-9]/g, ""));
-  };
-
   return (
     <View
       style={[
@@ -20,41 +10,27 @@ export default function RelatoriosItemScreen(props: any) {
         { width: "92%", alignSelf: "center" },
       ]}
     >
-      <View style={[styles.produtosRestauranteContainer, { width: "60%" }]}>
+      <View style={[styles.produtosRestauranteContainer, { width: "45%" }]}>
         <Text>{props.itemProduto.nome}</Text>
       </View>
       <View
         style={[
           styles.produtosValorContainer,
-          { width: "15%", borderColor: "green" },
+          { borderColor: "gray", width: "12%" },
         ]}
       >
-        <TextInput
-          caretHidden={true}
-          onFocus={() => {
-            setValorProdutoAnterior(quantidadeProduto);
-            setQuantidadeProduto("");
-          }}
-          value={quantidadeProduto}
-          maxLength={4}
-          keyboardType="number-pad"
-          onChangeText={quantidadeInputHandler}
-          onBlur={() => {
-            if (quantidadeProduto == "") {
-              setQuantidadeProduto(valorProdutoAnterior);
-            }
-          }}
-          onEndEditing={props.onUpdate.bind(
-            props,
-            props.itemProduto.restauranteId,
-            props.itemProduto.produtoId,
-            props.itemProduto.quantidadeProduto,
-            quantidadeProduto
-          )}
-        />
+        <Text>{props.itemProduto.quantidadeProduto}</Text>
+      </View>
+      <View
+        style={[
+          styles.produtosValorContainer,
+          { borderColor: "gray", width: "17%" },
+        ]}
+      >
+        <Text>R$ {props.itemProduto.valorProduto}</Text>
       </View>
       <View style={[styles.produtosValorContainer, { borderColor: "gray" }]}>
-        <Text>R$ {valorProduto}</Text>
+        <Text>R$ {props.itemProduto.valorTotalProduto}</Text>
       </View>
     </View>
   );

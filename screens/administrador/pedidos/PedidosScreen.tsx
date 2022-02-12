@@ -21,6 +21,7 @@ import gerarPedidoExcel from "../../../functions/gerarPedidoExcel";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Sharing from "expo-sharing";
+import moment from "moment";
 
 interface RestauranteDropdownList {
   label: string;
@@ -70,19 +71,13 @@ export default function PedidosScreen(props: any) {
   >([]);
 
   const [dataPedido, setDataPedido] = useState(
-    new Date()
-      .toLocaleString("en-CA", {
-        timeZone: "America/Sao_Paulo",
-      })
-      .slice(0, 10)
+    moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10)
   );
 
   const [pedido, setPedido] = useState<Pedido[]>([]);
 
   const [date, setDate] = useState(
-    new Date().toLocaleString("en-CA", {
-      timeZone: "America/Sao_Paulo",
-    })
+    moment().subtract(3, "hour").add(1, "days").toDate()
   );
   const [show, setShow] = useState(false);
   const [showButtons, setShowButtons] = useState(true);
@@ -216,11 +211,9 @@ export default function PedidosScreen(props: any) {
       }
 
       listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}${new Date().toLocaleString(
-          "en-CA",
-          {
-            timeZone: "America/Sao_Paulo",
-          }
+        key: `${item.restauranteId}${item.produtoId}${moment().subtract(
+          3,
+          "hour"
         )}`,
         produtoId: item.produtoId,
         restauranteId: item.restauranteId,
@@ -458,7 +451,7 @@ export default function PedidosScreen(props: any) {
             value={date}
             onChange={onChangeDate}
             textColor="#418ac7"
-            maximumDate={new Date()}
+            maximumDate={moment().subtract(3, "hour").add(1, "days").toDate()}
           />
         )}
       </View>
@@ -486,10 +479,10 @@ export default function PedidosScreen(props: any) {
           }}
         >
           {dataPedido ===
-            new Date()
-              .toLocaleString("en-CA", {
-                timeZone: "America/Sao_Paulo",
-              })
+            moment()
+              .subtract(3, "hour")
+              .add(1, "days")
+              .toJSON()
               .slice(0, 10) && (
             <TouchableOpacity
               style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}

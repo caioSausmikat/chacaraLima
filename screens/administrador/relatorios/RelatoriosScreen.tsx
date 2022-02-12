@@ -61,31 +61,13 @@ export default function RelatoriosScreen(props: any) {
   >([]);
 
   const [dataInicio, setDataInicio] = useState(
-    new Date()
-      .toLocaleString("en-CA", {
-        timeZone: "America/Sao_Paulo",
-      })
-      .slice(0, 10)
+    new Date().toJSON().slice(0, 10)
   );
 
-  const [dataFim, setDataFim] = useState(
-    new Date()
-      .toLocaleString("en-CA", {
-        timeZone: "America/Sao_Paulo",
-      })
-      .slice(0, 10)
-  );
+  const [dataFim, setDataFim] = useState(new Date().toJSON().slice(0, 10));
 
-  const [dateInicio, setDateInicio] = useState(
-    new Date().toLocaleString("en-CA", {
-      timeZone: "America/Sao_Paulo",
-    })
-  );
-  const [dateFim, setDateFim] = useState(
-    new Date().toLocaleString("en-CA", {
-      timeZone: "America/Sao_Paulo",
-    })
-  );
+  const [dateInicio, setDateInicio] = useState(new Date());
+  const [dateFim, setDateFim] = useState(new Date());
   const [showDatePickerDataInicio, setShowDatePickerDataInicio] =
     useState(false);
   const [showDatePickerDataFim, setShowDatePickerDataFim] = useState(false);
@@ -194,20 +176,17 @@ export default function RelatoriosScreen(props: any) {
       if (item.quantidadeProduto === 0) {
         quantidadeProdutosPedido++;
       }
-
       listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}${new Date().toLocaleString(
-          "en-CA",
-          {
-            timeZone: "America/Sao_Paulo",
-          }
-        )}`,
+        key: `${item.restauranteId}${item.produtoId}${new Date()}`,
         produtoId: item.produtoId,
         restauranteId: item.restauranteId,
         nome: capitalize(item.nome),
         quantidadeProduto: item.quantidadeProduto.toString(),
-        valorProduto: item.valorProduto.replace(".", ","),
-        valorTotalProduto: item.valorTotalProduto.replace(".", ","),
+        valorProduto: item.valorProduto.toFixed(2).toString().replace(".", ","),
+        valorTotalProduto: item.valorTotalProduto
+          .toFixed(2)
+          .toString()
+          .replace(".", ","),
       });
 
       if (quantidadeProdutosPedido === json.length) {
@@ -280,18 +259,25 @@ export default function RelatoriosScreen(props: any) {
         <View
           style={[
             Platform.OS === "ios"
-              ? { zIndex: 3000, flexDirection: "row", marginTop: 40 }
-              : { flexDirection: "row", marginTop: 40 },
+              ? {
+                  zIndex: 3000,
+                  flexDirection: "row",
+                  marginTop: 40,
+                  marginLeft: 15,
+                }
+              : { flexDirection: "row", marginTop: 40, marginLeft: 15 },
           ]}
         >
           <TouchableOpacity onPress={onPressDataInicioHandler}>
-            <View style={[styles.pedidosData, { height: "27%" }]}>
+            <View style={styles.pedidosData}>
               <Text
                 style={{
                   fontWeight: "bold",
                   color: "#418ac7",
                   alignSelf: "center",
                   fontSize: 14,
+                  paddingTop: 6,
+                  paddingBottom: 6,
                 }}
               >
                 {dataBr(dataInicio, "/")}
@@ -300,13 +286,15 @@ export default function RelatoriosScreen(props: any) {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onPressDataFimHandler}>
-            <View style={[styles.pedidosData, { height: "27%" }]}>
+            <View style={styles.pedidosData}>
               <Text
                 style={{
                   fontWeight: "bold",
                   color: "#418ac7",
                   alignSelf: "center",
                   fontSize: 14,
+                  paddingTop: 6,
+                  paddingBottom: 6,
                 }}
               >
                 {dataBr(dataFim, "/")}
@@ -316,7 +304,10 @@ export default function RelatoriosScreen(props: any) {
 
           <DropDownPicker
             zIndex={3000}
-            style={[styles.dropdownPickerPedidosStyle, { width: "50%" }]}
+            style={[
+              styles.dropdownPickerPedidosStyle,
+              { width: "45%", marginLeft: 5 },
+            ]}
             open={openDropDownRestaurantes}
             value={codigoRestauranteSelecionado}
             items={listaRestaurantes}

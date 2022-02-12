@@ -16,6 +16,7 @@ import RestaurantesItemScreen from "./RestaurantesItemScreen";
 import { Ionicons } from "@expo/vector-icons";
 import capitalize from "../../../functions/capitalize";
 import { TextInputMask } from "react-native-masked-text";
+import * as moment from "moment-timezone";
 
 interface RestauranteDropdownList {
   label: string;
@@ -173,12 +174,7 @@ export default function RestaurantesScreen({
     listaProdutosRestaurante.length = 0;
     for (const item of json) {
       listaProdutosRestaurante.push({
-        key: `${item.restauranteId}${item.produtoId}${new Date().toLocaleString(
-          "en-CA",
-          {
-            timeZone: "America/Sao_Paulo",
-          }
-        )}`,
+        key: `${item.restauranteId}${item.produtoId}${new Date()}`,
         produtoId: item.produtoId,
         restauranteId: item.restauranteId,
         nome: capitalize(item.Produto.nome),

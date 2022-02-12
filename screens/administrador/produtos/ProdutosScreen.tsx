@@ -62,9 +62,7 @@ export default function ProdutosScreen({
     listaProdutos.length = 0;
     for (const produto of listaProdutosJson) {
       listaProdutos.push({
-        key: `${produto.id}${new Date().toLocaleString("en-CA", {
-          timeZone: "America/Sao_Paulo",
-        })}`,
+        key: `${produto.id}${new Date()}`,
         produtoId: produto.id,
         nome: capitalize(produto.nome),
         ativo: produto.ativo,

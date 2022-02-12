@@ -152,9 +152,7 @@ app.post("/atualizaValorProdutoRestaurante", async (req, res) => {
       console.log(err);
     });
   response[0].valor = req.body.valor;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -206,9 +204,7 @@ app.post("/atualizaNomeProduto", async (req, res) => {
       console.log(err);
     });
   response[0].nome = req.body.nome;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -225,9 +221,7 @@ app.post("/desativarProduto", async (req, res) => {
       console.log(err);
     });
   response[0].ativo = 0;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -245,9 +239,7 @@ app.post("/incluirProduto", async (req, res) => {
     });
   if (responseFind[0]) {
     responseFind[0].ativo = 1;
-    responseFind[0].updateAt = new Date().toLocaleString("en-CA", {
-      timeZone: "America/Sao_Paulo",
-    });
+    responseFind[0].updateAt = new Date();
     responseFind[0].save();
     res.send(true);
   } else {
@@ -279,9 +271,7 @@ app.post("/atualizaNomeRestaurante", async (req, res) => {
       console.log(err);
     });
   response[0].nome = req.body.nome;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -298,9 +288,7 @@ app.post("/desativarRestaurante", async (req, res) => {
       console.log(err);
     });
   response[0].ativo = 0;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -318,9 +306,7 @@ app.post("/incluirRestaurante", async (req, res) => {
     });
   if (responseFind[0]) {
     responseFind[0].ativo = 1;
-    responseFind[0].updateAt = new Date().toLocaleString("en-CA", {
-      timeZone: "America/Sao_Paulo",
-    });
+    responseFind[0].updateAt = new Date();
     responseFind[0].save();
     res.send(true);
   } else {
@@ -365,9 +351,7 @@ app.post("/atualizaNomeUsuario", async (req, res) => {
       console.log(err);
     });
   response[0].nome = req.body.nome;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -440,9 +424,7 @@ app.post("/atualizaUsuario", async (req, res) => {
       console.log(err);
     });
   response[0].usuario = req.body.usuario;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -459,9 +441,7 @@ app.post("/atualizaTipoUsuario", async (req, res) => {
       console.log(err);
     });
   response[0].tiposUsuariosId = req.body.tiposUsuariosId;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -478,9 +458,7 @@ app.post("/atualizaRestauranteUsuario", async (req, res) => {
       console.log(err);
     });
   response[0].restaurantesId = req.body.restaurantesId;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -507,9 +485,7 @@ app.post("/alteraIndicadorAlteracaoSenha", async (req, res) => {
       console.log(err);
     });
   response[0].indicadorAlteracaoSenha = req.body.indicadorAlteracaoSenha;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -539,9 +515,7 @@ app.post("/redefinirSenha", async (req, res) => {
         console.log(err);
       });
     response[0].senha = req.body.senhaNova;
-    response[0].updateAt = new Date().toLocaleString("en-CA", {
-      timeZone: "America/Sao_Paulo",
-    });
+    response[0].updateAt = new Date();
     response[0].save();
     res.send(true);
   }
@@ -559,9 +533,7 @@ app.post("/criarSenha", async (req, res) => {
       console.log(err);
     });
   response[0].senha = req.body.senhaNova;
-  response[0].updateAt = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
 });
@@ -570,8 +542,6 @@ app.post("/criarSenha", async (req, res) => {
 app.post("/detalhaPedido", async (req, res) => {
   let listaFinalResponse = [];
 
-  // if (req.body.dataPedido === new Date().toLocaleString("en-CA", {
-  // timeZone: "America/Sao_Paulo"}).toJSON().slice(0, 10)) {
   const buscaPedidoResponse = await pedidos
     .findAll({
       where: {

@@ -14,9 +14,7 @@ export default async function gerarPedidoExcel(
   nomeRestauranteSelecionado: string
 ): Promise<string> {
   // export default async function gerarPedidoExcel(pedido: any, Promise: string) {
-  const now = new Date().toLocaleString("en-CA", {
-    timeZone: "America/Sao_Paulo",
-  });
+  const now = new Date();
   const fileName = `${nomeRestauranteSelecionado} - ${dataBr(
     pedido[0].dataPedido,
     "-"
