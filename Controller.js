@@ -115,11 +115,11 @@ app.post("/listaProdutosRestaurante", async (req, res) => {
       include: [
         {
           model: produtos,
-          as: "produtos",
+          as: "Produtos",
           where: {
             ativo: 1,
           },
-          order: [["produtos", "nome", "ASC"]],
+          order: [["Produtos", "nome", "ASC"]],
         },
       ],
       where: { restauranteId: req.body.codigoRestaurante },
