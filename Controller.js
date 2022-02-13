@@ -119,7 +119,7 @@ app.post("/listaProdutosRestaurante", async (req, res) => {
           where: {
             ativo: 1,
           },
-          order: [["produtos.nome", "ASC"]],
+          order: [["produtos", "nome", "ASC"]],
         },
       ],
       where: { restauranteId: req.body.codigoRestaurante },

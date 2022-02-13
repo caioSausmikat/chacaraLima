@@ -371,10 +371,14 @@ export default function PedidosScreen(props: any) {
       const jsonBuscarTodosPedidosDataResponse =
         await buscarTodosPedidosDataResponse.json();
 
-      shareableExcelUri = await gerarTodosPedidoDataExcel(
-        jsonBuscarTodosPedidosDataResponse,
-        dataBr(dataPedido, "-")
-      );
+      if (jsonBuscarTodosPedidosDataResponse.length > 0) {
+        shareableExcelUri = await gerarTodosPedidoDataExcel(
+          jsonBuscarTodosPedidosDataResponse,
+          dataBr(dataPedido, "-")
+        );
+      } else {
+        Alert.alert("Nenhum pedido na data selecionada!");
+      }
     } else {
       let nomeRestauranteSelecionado = "";
       for (const restaurante of listaRestaurantes) {
@@ -389,14 +393,16 @@ export default function PedidosScreen(props: any) {
       );
     }
 
-    Sharing.shareAsync(shareableExcelUri, {
-      mimeType:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
-      dialogTitle: "Your dialog title here", // Android and Web
-      UTI: "com.microsoft.excel.xlsx", // iOS
-    }).catch((error) => {
-      console.error("Error", error);
-    });
+    if (shareableExcelUri !== "") {
+      Sharing.shareAsync(shareableExcelUri, {
+        mimeType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
+        dialogTitle: "Your dialog title here", // Android and Web
+        UTI: "com.microsoft.excel.xlsx", // iOS
+      }).catch((error) => {
+        console.error("Error", error);
+      });
+    }
   }
 
   //Busca todos os pedidos de todos os restaurantes na data selecionada
