@@ -21,6 +21,7 @@ import gerarPedidoExcel from "../../../functions/gerarPedidoExcel";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Sharing from "expo-sharing";
+import moment from "moment";
 
 interface RestauranteDropdownList {
   label: string;
@@ -331,7 +332,7 @@ export default function RelatoriosScreen(props: any) {
             value={dateInicio}
             onChange={onChangeDataInicial}
             textColor="#418ac7"
-            maximumDate={new Date()}
+            maximumDate={moment().subtract(3, "hour").add(1, "days").toDate()}
           />
         )}
         {showDatePickerDataFim == true && (
@@ -340,7 +341,7 @@ export default function RelatoriosScreen(props: any) {
             value={dateFim}
             onChange={onChangeDataFim}
             textColor="#418ac7"
-            maximumDate={new Date()}
+            maximumDate={moment().subtract(3, "hour").add(1, "days").toDate()}
           />
         )}
       </View>

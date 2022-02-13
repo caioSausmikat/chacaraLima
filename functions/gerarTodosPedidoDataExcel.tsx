@@ -5,7 +5,7 @@ import * as FileSystem from "expo-file-system";
 import ExcelJS from "exceljs";
 // From @types/node/buffer
 import { Buffer as NodeBuffer } from "buffer";
-import dataBr from "./dataBr";
+import capitalize from "../functions/capitalize";
 
 // This returns a local uri that can be shared
 export default async function gerarPedidoExcel(
@@ -25,14 +25,20 @@ export default async function gerarPedidoExcel(
 
     let pedidosRestaurantes = [];
     let pedidosRestaurantesTemporaria = [];
-    for (let item = 0; item < listaPedidos; item++) {
+    for (let item = 0; item < listaPedidos.length; item++) {
       pedidosRestaurantesTemporaria.push(listaPedidos[item]);
-      if (
-        listaPedidos[item].nomeRestaurante !==
-        listaPedidos[item + 1].nomeRestaurante
-      ) {
-        pedidosRestaurantes.push(pedidosRestaurantesTemporaria);
-        pedidosRestaurantesTemporaria.length = 0;
+      if (item < listaPedidos.length - 1) {
+        if (
+          listaPedidos[item].nomeRestaurante !==
+          listaPedidos[item + 1].nomeRestaurante
+        ) {
+          pedidosRestaurantes.push(pedidosRestaurantesTemporaria);
+          pedidosRestaurantesTemporaria = [];
+        }
+      } else {
+        if (item === listaPedidos.length - 1) {
+          pedidosRestaurantes.push(pedidosRestaurantesTemporaria);
+        }
       }
     }
 
@@ -88,8 +94,10 @@ export default async function gerarPedidoExcel(
           valorTotal += item.quantidadeProduto * item.valorProduto;
           worksheet.addRow({
             quantidade: item.quantidadeProduto,
-            produto: item.nomeProduto,
-            valorUnidade: `R$ ${item.valorProduto.replace(".", ",")}`,
+            produto: capitalize(item.nomeProduto),
+            valorUnidade: `R$ ${item.valorProduto
+              .toFixed(2)
+              .replace(".", ",")}`,
             valorTotalProduto: `R$ ${(
               item.quantidadeProduto * item.valorProduto
             )
@@ -143,7 +151,7 @@ export default async function gerarPedidoExcel(
       worksheet.addRow({ quantidade: "" });
       worksheet.addRow({
         quantidade: "Data:",
-        produto: dataBr(pedido[0].dataPedido, "/"),
+        produto: dataPedido,
       });
       worksheet.addRow({ quantidade: pedido[0].nomeRestaurante });
       worksheet.mergeCells("A51:D51");
@@ -158,8 +166,10 @@ export default async function gerarPedidoExcel(
         if (item.quantidadeProduto > 0) {
           worksheet.addRow({
             quantidade: item.quantidadeProduto,
-            produto: item.nomeProduto,
-            valorUnidade: `R$ ${item.valorProduto.replace(".", ",")}`,
+            produto: capitalize(item.nomeProduto),
+            valorUnidade: `R$ ${item.valorProduto
+              .toFixed(2)
+              .replace(".", ",")}`,
             valorTotalProduto: `R$ ${(
               item.quantidadeProduto * item.valorProduto
             )

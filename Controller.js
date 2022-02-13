@@ -118,6 +118,7 @@ app.post("/listaProdutosRestaurante", async (req, res) => {
           where: {
             ativo: 1,
           },
+          order: [["produtos.nome", "ASC"]],
         },
       ],
       where: { restauranteId: req.body.codigoRestaurante },
@@ -554,7 +555,7 @@ app.post("/detalhaPedido", async (req, res) => {
     });
 
   const response = await sequelize.query(
-    `SELECT A.restauranteId, A.produtoId, FORMAT(A.valor,2) AS valorProduto, ' ' AS dataPedido, ' ' AS usuarioId, ' ' AS nomeUsuario, 0 AS quantidadeProduto, B.nome FROM produtosrestaurantes A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND B.ativo = 1`,
+    `SELECT A.restauranteId, A.produtoId, FORMAT(A.valor,2) AS valorProduto, ' ' AS dataPedido, ' ' AS usuarioId, ' ' AS nomeUsuario, 0 AS quantidadeProduto, B.nome FROM produtosrestaurantes A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND B.ativo = 1 ORDER BY A.produtoId`,
     { raw: true }
   );
 

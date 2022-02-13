@@ -372,7 +372,8 @@ export default function PedidosScreen(props: any) {
         await buscarTodosPedidosDataResponse.json();
 
       shareableExcelUri = await gerarTodosPedidoDataExcel(
-        jsonBuscarTodosPedidosDataResponse, dataPedido
+        jsonBuscarTodosPedidosDataResponse,
+        dataBr(dataPedido, "-")
       );
     } else {
       let nomeRestauranteSelecionado = "";
@@ -513,7 +514,7 @@ export default function PedidosScreen(props: any) {
         )}
       </View>
 
-      {listaProdutosRestaurante.length > 0 && (
+      {listaProdutosRestaurante.length > 0 && todosPedidos == false && (
         <FlatList
           data={listaProdutosRestaurante}
           extraData={atualizaFlatList}
@@ -553,19 +554,21 @@ export default function PedidosScreen(props: any) {
               </TouchableOpacity>
             )}
 
-          {pedido.length > 0 && pedidoDataRestaurante == true && (
-            <TouchableOpacity
-              style={styles.gerarExcelButton}
-              onPress={() => {
-                shareExcel();
-              }}
-            >
-              <Image
-                style={{ width: 50, height: 50 }}
-                source={require("../../../assets/images/excel.icon.jpg")}
-              />
-            </TouchableOpacity>
-          )}
+          {pedido.length > 0 &&
+            pedidoDataRestaurante == true &&
+            todosPedidos == false && (
+              <TouchableOpacity
+                style={styles.gerarExcelButton}
+                onPress={() => {
+                  shareExcel();
+                }}
+              >
+                <Image
+                  style={{ width: 50, height: 50 }}
+                  source={require("../../../assets/images/excel.icon.jpg")}
+                />
+              </TouchableOpacity>
+            )}
 
           {pedido.length > 0 &&
             pedidoDataRestaurante == true &&
@@ -581,6 +584,27 @@ export default function PedidosScreen(props: any) {
                 </Text>
               </TouchableOpacity>
             )}
+        </View>
+      )}
+      {todosPedidos == true && (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            height: "15%",
+          }}
+        >
+          <TouchableOpacity
+            style={styles.gerarExcelButton}
+            onPress={() => {
+              shareExcel();
+            }}
+          >
+            <Image
+              style={{ width: 50, height: 50 }}
+              source={require("../../../assets/images/excel.icon.jpg")}
+            />
+          </TouchableOpacity>
         </View>
       )}
     </View>
