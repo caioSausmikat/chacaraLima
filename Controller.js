@@ -115,14 +115,15 @@ app.post("/listaProdutosRestaurante", async (req, res) => {
       include: [
         {
           model: produtos,
-          as: "Produtos",
           where: {
             ativo: 1,
           },
-          order: [["Produtos", "nome", "ASC"]],
         },
       ],
       where: { restauranteId: req.body.codigoRestaurante },
+      order: [
+        [ produtos, 'nome', 'ASC' ], 
+      ]
     })
     .catch((err) => {
       console.log(err);
