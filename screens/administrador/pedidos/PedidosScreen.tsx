@@ -18,6 +18,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import dataBr from "../../../functions/dataBr";
 import gerarPedidoExcel from "../../../functions/gerarPedidoExcel";
+import gerarTodosPedidoDataExcel from "../../../functions/gerarTodosPedidoDataExcel";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Sharing from "expo-sharing";
@@ -81,6 +82,8 @@ export default function PedidosScreen(props: any) {
   );
   const [show, setShow] = useState(false);
   const [showButtons, setShowButtons] = useState(true);
+
+  const [todosPedidos, setTodosPedidos] = useState(false);
 
   const [expoPushToken, setExpoPushToken] = useState(null);
 
@@ -357,18 +360,34 @@ export default function PedidosScreen(props: any) {
     setShow(!show);
   };
 
+  const onPressTodosPedidosHandler = () => {
+    setTodosPedidos(!todosPedidos);
+  };
+
   async function shareExcel() {
-    let nomeRestauranteSelecionado = "";
-    for (const restaurante of listaRestaurantes) {
-      if (restaurante.value === codigoRestauranteSelecionado)
-        [(nomeRestauranteSelecionado = restaurante.label)];
+    let shareableExcelUri = "";
+    if (todosPedidos == true) {
+      const buscarTodosPedidosDataResponse = await buscarTodosPedidosData();
+      const jsonBuscarTodosPedidosDataResponse =
+        await buscarTodosPedidosDataResponse.json();
+
+      shareableExcelUri = await gerarTodosPedidoDataExcel(
+        jsonBuscarTodosPedidosDataResponse, dataPedido
+      );
+    } else {
+      let nomeRestauranteSelecionado = "";
+      for (const restaurante of listaRestaurantes) {
+        if (restaurante.value === codigoRestauranteSelecionado)
+          [(nomeRestauranteSelecionado = restaurante.label)];
+      }
+
+      shareableExcelUri = await gerarPedidoExcel(
+        pedido,
+        listaProdutosRestaurante,
+        nomeRestauranteSelecionado
+      );
     }
 
-    const shareableExcelUri: string = await gerarPedidoExcel(
-      pedido,
-      listaProdutosRestaurante,
-      nomeRestauranteSelecionado
-    );
     Sharing.shareAsync(shareableExcelUri, {
       mimeType:
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
@@ -376,6 +395,20 @@ export default function PedidosScreen(props: any) {
       UTI: "com.microsoft.excel.xlsx", // iOS
     }).catch((error) => {
       console.error("Error", error);
+    });
+  }
+
+  //Busca todos os pedidos de todos os restaurantes na data selecionada
+  function buscarTodosPedidosData() {
+    return fetch(`${config.urlRoot}geraRecibosPedidosData`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dataPedido: dataPedido,
+      }),
     });
   }
 
@@ -425,23 +458,47 @@ export default function PedidosScreen(props: any) {
             </Text>
           </View>
 
-          <DropDownPicker
-            zIndex={3000}
-            style={styles.dropdownPickerPedidosStyle}
-            open={openDropDownRestaurantes}
-            value={codigoRestauranteSelecionado}
-            items={listaRestaurantes}
-            setOpen={setOpenDropDownRestaurantes}
-            setValue={setCodigoRestauranteSelecionado}
-            placeholder="Selecione o restaurante"
-            dropDownContainerStyle={{
-              borderColor: "green",
-              width: "55%",
-            }}
-            onChangeValue={() => {
-              atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-            }}
-          />
+          <TouchableOpacity onPress={onPressTodosPedidosHandler}>
+            <Ionicons
+              style={{ color: "#418ac7" }}
+              name={todosPedidos ? "file-tray-full" : "file-tray"}
+              size={40}
+            />
+          </TouchableOpacity>
+
+          {todosPedidos == false && (
+            <DropDownPicker
+              zIndex={3000}
+              style={[styles.dropdownPickerPedidosStyle, { width: "45%" }]}
+              open={openDropDownRestaurantes}
+              value={codigoRestauranteSelecionado}
+              items={listaRestaurantes}
+              setOpen={setOpenDropDownRestaurantes}
+              setValue={setCodigoRestauranteSelecionado}
+              placeholder="Selecione o restaurante"
+              dropDownContainerStyle={{
+                borderColor: "green",
+                width: "45%",
+              }}
+              onChangeValue={() => {
+                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+              }}
+            />
+          )}
+          {todosPedidos == true && (
+            <View style={[styles.pedidosData, { width: "45%" }]}>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: "#418ac7",
+                  alignSelf: "center",
+                  fontSize: 14,
+                }}
+              >
+                Todos os pedidos
+              </Text>
+            </View>
+          )}
         </View>
       )}
       <View>
@@ -479,22 +536,22 @@ export default function PedidosScreen(props: any) {
           }}
         >
           {dataPedido ===
-            moment()
-              .subtract(3, "hour")
-              .add(1, "days")
-              .toJSON()
-              .slice(0, 10) && (
-            <TouchableOpacity
-              style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}
-              onPress={() => {
-                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-              }}
-            >
-              <Text style={styles.confirmaRedefinicaoSenhaText}>
-                Buscar Pedido
-              </Text>
-            </TouchableOpacity>
-          )}
+            moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10) &&
+            todosPedidos == false && (
+              <TouchableOpacity
+                style={[
+                  styles.buscaPedidoButton,
+                  { backgroundColor: "#4b9666" },
+                ]}
+                onPress={() => {
+                  atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+                }}
+              >
+                <Text style={styles.confirmaRedefinicaoSenhaText}>
+                  Buscar Pedido
+                </Text>
+              </TouchableOpacity>
+            )}
 
           {pedido.length > 0 && pedidoDataRestaurante == true && (
             <TouchableOpacity
@@ -510,18 +567,20 @@ export default function PedidosScreen(props: any) {
             </TouchableOpacity>
           )}
 
-          {pedido.length > 0 && pedidoDataRestaurante == true && (
-            <TouchableOpacity
-              style={styles.buscaPedidoButton}
-              onPress={() => {
-                salvarPedido();
-              }}
-            >
-              <Text style={styles.confirmaRedefinicaoSenhaText}>
-                Salvar Pedido
-              </Text>
-            </TouchableOpacity>
-          )}
+          {pedido.length > 0 &&
+            pedidoDataRestaurante == true &&
+            todosPedidos == false && (
+              <TouchableOpacity
+                style={styles.buscaPedidoButton}
+                onPress={() => {
+                  salvarPedido();
+                }}
+              >
+                <Text style={styles.confirmaRedefinicaoSenhaText}>
+                  Salvar Pedido
+                </Text>
+              </TouchableOpacity>
+            )}
         </View>
       )}
     </View>

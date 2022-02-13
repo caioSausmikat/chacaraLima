@@ -660,7 +660,7 @@ app.post("/geraRelatorio", async (req, res) => {
 //Gera recibos de todos os restaurantes com pedido em uma data
 app.post("/geraRecibosPedidosData", async (req, res) => {
   const response = await sequelize.query(
-    `SELECT C.nome, B.nome, A.quantidadeProduto, A.valorProduto FROM pedidos A, produtos B, restaurantes C WHERE A.produtoId = B.id AND A.restauranteId = C.id AND A.dataPedido = '${req.body.dataPedido}' ORDER BY C.nome, B.nome`,
+    `SELECT C.nome AS nomeRestaurante, B.nome AS nomeProduto, A.quantidadeProduto, A.valorProduto FROM pedidos A, produtos B, restaurantes C WHERE A.produtoId = B.id AND A.restauranteId = C.id AND A.dataPedido = '${req.body.dataPedido}' ORDER BY C.nome, B.nome`,
     { raw: true }
   );
   let pedidos = [];
