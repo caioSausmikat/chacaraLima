@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   TouchableOpacity,
-  Keyboard,
   Alert,
   Text,
   Platform,
@@ -15,11 +14,8 @@ import { FlatList } from "native-base";
 import RelatoriosItemScreen from "./RelatoriosItemScreen";
 import capitalize from "../../../functions/capitalize";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
 import dataBr from "../../../functions/dataBr";
-import gerarPedidoExcel from "../../../functions/gerarPedidoExcel";
-import Constants from "expo-constants";
-import * as Notifications from "expo-notifications";
+import gerarRelatorioExcel from "../../../functions/gerarRelatorioExcel";
 import * as Sharing from "expo-sharing";
 import moment from "moment";
 
@@ -110,17 +106,21 @@ export default function RelatoriosScreen(props: any) {
   }
 
   async function atualizaProdutosRestaurante(restauranteId: number) {
-    const buscarListaProdutosRestauranteSelecionadoResponse =
-      await buscarListaProdutosRestauranteSelecionado(restauranteId);
+    if (dataInicio <= dataFim) {
+      const buscarListaProdutosRestauranteSelecionadoResponse =
+        await buscarListaProdutosRestauranteSelecionado(restauranteId);
 
-    const jsonBuscarListaProdutosRestauranteSelecionado =
-      await buscarListaProdutosRestauranteSelecionadoResponse.json();
+      const jsonBuscarListaProdutosRestauranteSelecionado =
+        await buscarListaProdutosRestauranteSelecionadoResponse.json();
 
-    setMostrarProdutosRestaurante(
-      await carregaListaProdutosRestauranteSelecionado(
-        jsonBuscarListaProdutosRestauranteSelecionado
-      )
-    );
+      setMostrarProdutosRestaurante(
+        await carregaListaProdutosRestauranteSelecionado(
+          jsonBuscarListaProdutosRestauranteSelecionado
+        )
+      );
+    } else {
+      Alert.alert("Data de inicial maior que data final!");
+    }
   }
 
   //Busca lista de restaurantes
@@ -256,13 +256,11 @@ export default function RelatoriosScreen(props: any) {
     }
 
     const buscarRelatorioRestauranteDatasResponse =
-      await buscarRelatorioRestauranteDatas();
+      await buscarRelatorioRestauranteDatas(codigoRestauranteSelecionado);
     const jsonBuscarRelatorioRestauranteDatasResponse =
       await buscarRelatorioRestauranteDatasResponse.json();
 
     const shareableExcelUri: string = await gerarRelatorioExcel(
-      dataInicio,
-      dataFim,
       nomeRestauranteSelecionado,
       jsonBuscarRelatorioRestauranteDatasResponse
     );

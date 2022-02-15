@@ -116,7 +116,7 @@ app.post("/listaProdutosRestaurante", async (req, res) => {
         {
           model: produtos,
           where: {
-            ativo: 1,
+            ativo: req.body.ativo,
           },
         },
       ],
