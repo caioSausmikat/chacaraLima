@@ -169,8 +169,23 @@ export default function RelatoriosScreen(props: any) {
     });
   }
 
+  //Busca lista de produtos de restaurante selecionado
+  function buscarListaProdutosRestauranteSelecionado(restauranteId: number) {
+    return fetch(`${config.urlRoot}listaTodosProdutosRestaurante`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ codigoRestaurante: restauranteId }),
+    });
+  }
+
   //Busca detalhamento de todos os pedidos para restaurante em datas selecionadas
-  function buscarRelatorioRestauranteDatas(restauranteId: number) {
+  function buscarRelatorioRestauranteDatas(
+    restauranteId: number,
+    jsonBuscarListaProdutosRestauranteSelecionadoResponse: any
+  ) {
     return fetch(`${config.urlRoot}geraRelatorioDetalhado`, {
       method: "POST",
       headers: {
@@ -254,15 +269,25 @@ export default function RelatoriosScreen(props: any) {
       if (restaurante.value === codigoRestauranteSelecionado)
         nomeRestauranteSelecionado = restaurante.label;
     }
+    const buscarListaProdutosRestauranteSelecionadoResponse =
+      await buscarListaProdutosRestauranteSelecionado(
+        codigoRestauranteSelecionado
+      );
+    const jsonBuscarListaProdutosRestauranteSelecionadoResponse =
+      await buscarListaProdutosRestauranteSelecionadoResponse.json();
 
     const buscarRelatorioRestauranteDatasResponse =
-      await buscarRelatorioRestauranteDatas(codigoRestauranteSelecionado);
+      await buscarRelatorioRestauranteDatas(
+        codigoRestauranteSelecionado,
+        jsonBuscarListaProdutosRestauranteSelecionadoResponse
+      );
     const jsonBuscarRelatorioRestauranteDatasResponse =
       await buscarRelatorioRestauranteDatasResponse.json();
 
     const shareableExcelUri: string = await gerarRelatorioExcel(
       nomeRestauranteSelecionado,
-      jsonBuscarRelatorioRestauranteDatasResponse
+      jsonBuscarRelatorioRestauranteDatasResponse,
+      jsonBuscarListaProdutosRestauranteSelecionadoResponse
     );
     Sharing.shareAsync(shareableExcelUri, {
       mimeType:

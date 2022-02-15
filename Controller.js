@@ -116,8 +116,26 @@ app.post("/listaProdutosRestaurante", async (req, res) => {
         {
           model: produtos,
           where: {
-            ativo: req.body.ativo,
+            ativo: 1,
           },
+        },
+      ],
+      where: { restauranteId: req.body.codigoRestaurante },
+      order: [[produtos, "nome", "ASC"]],
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  res.send(JSON.stringify(response));
+});
+
+//Buscar lista de todos os produtos de um restaurante
+app.post("/listaTodosProdutosRestaurante", async (req, res) => {
+  let response = await produtosRestaurante
+    .findAll({
+      include: [
+        {
+          model: produtos
         },
       ],
       where: { restauranteId: req.body.codigoRestaurante },
