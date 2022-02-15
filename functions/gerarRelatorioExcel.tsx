@@ -5,10 +5,10 @@ import * as FileSystem from "expo-file-system";
 import ExcelJS from "exceljs";
 // From @types/node/buffer
 import { Buffer as NodeBuffer } from "buffer";
-import dataBr from "../functions/dataBr";
+import dataBr from "./dataBr";
 
 // This returns a local uri that can be shared
-export default async function gerarPedidoExcel(
+export default async function gerarRelatorioExcel(
   pedido: any,
   listaProdutosRestaurante: any,
   nomeRestauranteSelecionado: string

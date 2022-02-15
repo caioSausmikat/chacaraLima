@@ -421,7 +421,7 @@ export default function PedidosScreen(props: any) {
 
   return (
     <View style={styles.container}>
-      {pedido.length > 0 && nomeUsuarioPedido !== "" && (
+      {pedido.length > 0 && nomeUsuarioPedido !== "" && todosPedidos == false && (
         <View style={{ justifyContent: "center", marginTop: 10 }}>
           <Text
             style={{
@@ -444,28 +444,10 @@ export default function PedidosScreen(props: any) {
             nomeUsuarioPedido !== "" ? { marginTop: 13 } : { marginTop: 40 },
           ]}
         >
-          <TouchableOpacity onPress={onPressDateHandler}>
-            <Ionicons
-              style={{ color: "#418ac7", marginLeft: 20 }}
-              name="calendar"
-              size={40}
-              title="Show date picker!"
-            />
-          </TouchableOpacity>
-          <View style={styles.pedidosData}>
-            <Text
-              style={{
-                fontWeight: "bold",
-                color: "#418ac7",
-                alignSelf: "center",
-                fontSize: 14,
-              }}
-            >
-              {dataBr(dataPedido, "/")}
-            </Text>
-          </View>
-
-          <TouchableOpacity onPress={onPressTodosPedidosHandler}>
+          <TouchableOpacity
+            style={{ marginLeft: 20 }}
+            onPress={onPressTodosPedidosHandler}
+          >
             <Ionicons
               style={{ color: "#418ac7" }}
               name={todosPedidos ? "file-tray-full" : "file-tray"}
@@ -473,10 +455,34 @@ export default function PedidosScreen(props: any) {
             />
           </TouchableOpacity>
 
+          <TouchableOpacity onPress={onPressDateHandler}>
+            <View
+              style={[
+                styles.pedidosData,
+                {
+                  borderColor: "green",
+                  paddingBottom: "17%",
+                  paddingTop: "17%",
+                },
+              ]}
+            >
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: "#418ac7",
+                  alignSelf: "center",
+                  fontSize: 14,
+                }}
+              >
+                {dataBr(dataPedido, "/")}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
           {todosPedidos == false && (
             <DropDownPicker
               zIndex={3000}
-              style={[styles.dropdownPickerPedidosStyle, { width: "45%" }]}
+              style={[styles.dropdownPickerPedidosStyle, { width: "55%" }]}
               open={openDropDownRestaurantes}
               value={codigoRestauranteSelecionado}
               items={listaRestaurantes}
@@ -485,7 +491,7 @@ export default function PedidosScreen(props: any) {
               placeholder="Selecione o restaurante"
               dropDownContainerStyle={{
                 borderColor: "green",
-                width: "45%",
+                width: "55%",
               }}
               onChangeValue={() => {
                 atualizaProdutosRestaurante(codigoRestauranteSelecionado);
@@ -493,7 +499,7 @@ export default function PedidosScreen(props: any) {
             />
           )}
           {todosPedidos == true && (
-            <View style={[styles.pedidosData, { width: "45%" }]}>
+            <View style={[styles.pedidosData, { width: "45%", height: 55 }]}>
               <Text
                 style={{
                   fontWeight: "bold",

@@ -12,7 +12,6 @@ export default async function gerarPedidoExcel(
   listaPedidos: any,
   dataPedido: string
 ): Promise<string> {
-  // export default async function gerarPedidoExcel(pedido: any, Promise: string) {
   const now = new Date();
   const fileName = `Todos os pedidos - ${dataPedido}.xlsx`;
   const fileUri = FileSystem.cacheDirectory + fileName;
@@ -56,7 +55,7 @@ export default async function gerarPedidoExcel(
       };
 
       worksheet.pageSetup.orientation = "portrait";
-
+      worksheet.pageSetup.paperSize = 256;
       worksheet.pageSetup.printArea = "A1:D85";
 
       worksheet.columns = [

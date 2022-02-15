@@ -169,6 +169,22 @@ export default function RelatoriosScreen(props: any) {
     });
   }
 
+  //Busca detalhamento de todos os pedidos para restaurante em datas selecionadas
+  function buscarRelatorioRestauranteDatas(restauranteId: number) {
+    return fetch(`${config.urlRoot}geraRelatorioDetalhado`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        restauranteId: restauranteId,
+        dataInicio: dataInicio,
+        dataFim: dataFim,
+      }),
+    });
+  }
+
   function carregaListaProdutosRestauranteSelecionado(json: any) {
     listaProdutosRestaurante.length = 0;
 
@@ -236,22 +252,28 @@ export default function RelatoriosScreen(props: any) {
     let nomeRestauranteSelecionado = "";
     for (const restaurante of listaRestaurantes) {
       if (restaurante.value === codigoRestauranteSelecionado)
-        [(nomeRestauranteSelecionado = restaurante.label)];
+        nomeRestauranteSelecionado = restaurante.label;
     }
 
-    // const shareableExcelUri: string = await gerarPedidoExcel(
-    //   pedido,
-    //   listaProdutosRestaurante,
-    //   nomeRestauranteSelecionado
-    // );
-    // Sharing.shareAsync(shareableExcelUri, {
-    //   mimeType:
-    //     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
-    //   dialogTitle: "Your dialog title here", // Android and Web
-    //   UTI: "com.microsoft.excel.xlsx", // iOS
-    // }).catch((error) => {
-    //   console.error("Error", error);
-    // });
+    const buscarRelatorioRestauranteDatasResponse =
+      await buscarRelatorioRestauranteDatas();
+    const jsonBuscarRelatorioRestauranteDatasResponse =
+      await buscarRelatorioRestauranteDatasResponse.json();
+
+    const shareableExcelUri: string = await gerarRelatorioExcel(
+      dataInicio,
+      dataFim,
+      nomeRestauranteSelecionado,
+      jsonBuscarRelatorioRestauranteDatasResponse
+    );
+    Sharing.shareAsync(shareableExcelUri, {
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
+      dialogTitle: "Your dialog title here", // Android and Web
+      UTI: "com.microsoft.excel.xlsx", // iOS
+    }).catch((error) => {
+      console.error("Error", error);
+    });
   }
 
   return (
@@ -317,7 +339,8 @@ export default function RelatoriosScreen(props: any) {
             placeholder="Selecione o restaurante"
             dropDownContainerStyle={{
               borderColor: "green",
-              width: "55%",
+              width: "45%",
+              marginLeft: 5,
             }}
             onChangeValue={() => {
               atualizaProdutosRestaurante(codigoRestauranteSelecionado);
@@ -357,7 +380,7 @@ export default function RelatoriosScreen(props: any) {
         />
       )}
 
-      {/* {pedidoDataRestaurante == true && (
+      {pedidoDataRestaurante == true && (
         <View
           style={{
             flexDirection: "row",
@@ -377,7 +400,7 @@ export default function RelatoriosScreen(props: any) {
             />
           </TouchableOpacity>
         </View>
-      )} */}
+      )}
     </View>
   );
 }

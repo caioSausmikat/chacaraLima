@@ -121,9 +121,7 @@ app.post("/listaProdutosRestaurante", async (req, res) => {
         },
       ],
       where: { restauranteId: req.body.codigoRestaurante },
-      order: [
-        [ produtos, 'nome', 'ASC' ], 
-      ]
+      order: [[produtos, "nome", "ASC"]],
     })
     .catch((err) => {
       console.log(err);
@@ -649,7 +647,21 @@ app.post("/buscaDadosRestaurante", async (req, res) => {
 //Gera relatorio de restaurante em determinado periodo
 app.post("/geraRelatorio", async (req, res) => {
   const response = await sequelize.query(
-    `SELECT A.produtoId, A.restauranteId, B.nome, SUM(A.quantidadeProduto) AS quantidadeProduto, A.valorProduto, SUM(A.quantidadeProduto * A.valorProduto) AS valorTotalProduto FROM pedidos A, produtos B WHERE A.dataPedido between '${req.body.dataInicio}' AND '${req.body.dataFim}' AND A.restauranteId = ${req.body.restauranteId} AND A.produtoId = B.id GROUP BY A.produtoId`,
+    `SELECT A.produtoId, A.restauranteId, B.nome, SUM(A.quantidadeProduto) AS quantidadeProduto, A.valorProduto, SUM(A.quantidadeProduto * A.valorProduto) AS valorTotalProduto FROM pedidos A, produtos B WHERE A.dataPedido between '${req.body.dataInicio}' AND '${req.body.dataFim}' AND A.restauranteId = ${req.body.restauranteId} AND A.produtoId = B.id GROUP BY A.produtoId ORDER BY B.nome`,
+    { raw: true }
+  );
+
+  let relatorioResponse = [];
+  for (const itemRestaurante of response[0]) {
+    relatorioResponse.push(itemRestaurante);
+  }
+  res.send(JSON.stringify(relatorioResponse));
+});
+
+//Gera relatorio detalhado de restaurante em determinado periodo
+app.post("/geraRelatorioDetalhado", async (req, res) => {
+  const response = await sequelize.query(
+    `SELECT A.produtoId, A.restauranteId, B.nome, A.quantidadeProduto, A.valorProduto, (A.quantidadeProduto * A.valorProduto) AS valorTotalProduto, A.dataPedido FROM pedidos A, produtos B WHERE A.dataPedido between '${req.body.dataInicio}' AND '${req.body.dataFim}' AND A.restauranteId = ${req.body.restauranteId} AND A.produtoId = B.id ORDER BY A.dataPedido, B.nome`,
     { raw: true }
   );
 
