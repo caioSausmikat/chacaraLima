@@ -6,6 +6,7 @@ const models = require("./models");
 const Sequelize = require("sequelize");
 const { Expo } = require("expo-server-sdk");
 const { engine } = require("express-handlebars");
+const bcrypt = require("bcrypt");
 
 const sequelize = new Sequelize(
   config.production.database,
@@ -498,7 +499,10 @@ app.post("/redefinirSenha", async (req, res) => {
       .catch((err) => {
         console.log(err);
       });
-    response[0].senha = req.body.senhaNova;
+    const plaintextPassword = req.body.senhaNova;
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(plaintextPassword, salt);
+    response[0].senha = hash;
     response[0].updateAt = new Date();
     response[0].save();
     res.send(true);
