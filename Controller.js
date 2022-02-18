@@ -35,9 +35,12 @@ let tokens = models.Tokens;
 let expo = new Expo();
 
 app.post("/login", async (req, res) => {
+  const plaintextPassword = req.body.senha;
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(plaintextPassword, salt);
   let response = await usuarios
     .findOne({
-      where: { usuario: req.body.usuario, senha: req.body.senha },
+      where: { usuario: req.body.usuario, senha: hash },
     })
     .catch((err) => {
       console.log(err);
@@ -520,7 +523,10 @@ app.post("/criarSenha", async (req, res) => {
     .catch((err) => {
       console.log(err);
     });
-  response[0].senha = req.body.senhaNova;
+    const plaintextPassword = req.body.senhaNova;
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(plaintextPassword, salt);
+  response[0].senha = hash;
   response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
