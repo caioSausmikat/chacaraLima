@@ -26,7 +26,7 @@ export default async function gerarPedidoExcel(
     workbook.created = now;
     workbook.modified = now;
     // Add a sheet to work on
-    const worksheet = workbook.addWorksheet("My Sheet", {});
+    const worksheet = workbook.addWorksheet(nomeRestauranteSelecionado, {});
 
     for (const itemPedido of pedido) {
       for (const produto of listaProdutosRestaurante) {

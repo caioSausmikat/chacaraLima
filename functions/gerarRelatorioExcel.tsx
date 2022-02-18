@@ -6,18 +6,21 @@ import ExcelJS from "exceljs";
 // From @types/node/buffer
 import { Buffer as NodeBuffer } from "buffer";
 import dataBr from "./dataBr";
+import capitalize from "../functions/capitalize";
 
 // This returns a local uri that can be shared
 export default async function gerarRelatorioExcel(
-  pedido: any,
+  nomeRestauranteSelecionado: string,
+  pedidos: any,
   listaProdutosRestaurante: any,
-  nomeRestauranteSelecionado: string
+  dataInicio: string,
+  dataFim: string
 ): Promise<string> {
   const now = new Date();
   const fileName = `${nomeRestauranteSelecionado} - ${dataBr(
-    pedido[0].dataPedido,
+    dataInicio,
     "-"
-  )}.xlsx`;
+  )} a ${dataBr(dataFim, "-")}.xlsx`;
   const fileUri = FileSystem.cacheDirectory + fileName;
 
   return new Promise<string>((resolve, reject) => {
@@ -26,15 +29,7 @@ export default async function gerarRelatorioExcel(
     workbook.created = now;
     workbook.modified = now;
     // Add a sheet to work on
-    const worksheet = workbook.addWorksheet("My Sheet", {});
-
-    for (const itemPedido of pedido) {
-      for (const produto of listaProdutosRestaurante) {
-        if (itemPedido.produtoId === produto.produtoId) {
-          itemPedido.nomeProduto = produto.nome;
-        }
-      }
-    }
+    const worksheet = workbook.addWorksheet(nomeRestauranteSelecionado, {});
 
     worksheet.pageSetup.margins = {
       left: 0,
@@ -45,335 +40,271 @@ export default async function gerarRelatorioExcel(
       footer: 0.8,
     };
 
-    worksheet.pageSetup.orientation = "portrait";
-    worksheet.pageSetup.paperSize = 256;
-    worksheet.pageSetup.printArea = "A1:D85";
+    worksheet.pageSetup.orientation = "landscape";
+    worksheet.pageSetup.paperSize = 9;
+    worksheet.pageSetup.scale = 89;
 
-    worksheet.columns = [
-      { header: "Chácara Lima", key: "quantidade", width: 4.57 },
-      { header: "", key: "produto", width: 15.28 },
-      { header: "", key: "valorUnidade", width: 6.28 },
-      { header: "", key: "valorTotalProduto", width: 9.42 },
-    ];
+    const alfabeto =
+      "A;B;C;D;E;F;G;H;I;J;K;L;M;N;O;P;Q;R;S;T;U;V;W;X;Y;Z;AA;AB;AC;AD;AE;AF;AG;AH;AI;AJ;AK;AL;AM;AN;AO;AP;AQ;AR;AS;AT;AU;AV;AW;AX;AY;AZ";
+    const arrayAlfabeto = alfabeto.split(";");
 
-    worksheet.mergeCells("A1:D1");
-    worksheet.addRow({ quantidade: "Colônia Agrícola Samambaia Chácara 23" });
-    worksheet.mergeCells("A2:D2");
-    worksheet.addRow({ quantidade: "Tel. (61) 99983-5779" });
-    worksheet.mergeCells("A3:D3");
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({ quantidade: "" });
+    const meses = "Jan;Fev;Mar;Abr;Mai;Jun;Jul;Ago;Set;Out;Nov;Dez";
+    const arrayMeses = meses.split(";");
+
+    worksheet.columns = [{ header: "", key: "produto", width: 17.58 }];
+
+    worksheet.addRow({ produto: "" });
+    worksheet.addRow({ produto: "" });
+    worksheet.addRow({ produto: "" });
     worksheet.addRow({
-      quantidade: "Data:",
-      produto: dataBr(pedido[0].dataPedido, "/"),
-    });
-    worksheet.addRow({ quantidade: nomeRestauranteSelecionado });
-    worksheet.mergeCells("A7:D7");
-    worksheet.addRow({
-      quantidade: "Qt.",
-      produto: "Produtos",
-      valorUnidade: "Valor U",
-      valorTotalProduto: "Total",
+      produto: `Controle de Vendas CHACARA LIMA ${nomeRestauranteSelecionado}`,
     });
 
-    let valorTotal = 0;
-    let quantidadeProdutos = 0;
-    for (const item of pedido) {
-      if (item.quantidadeProduto > 0) {
-        quantidadeProdutos++;
-        valorTotal += item.quantidadeProduto * item.valorProduto;
-        worksheet.addRow({
-          quantidade: item.quantidadeProduto,
-          produto: item.nomeProduto,
-          valorUnidade: `R$ ${item.valorProduto.replace(".", ",")}`,
-          valorTotalProduto: `R$ ${(item.quantidadeProduto * item.valorProduto)
-            .toFixed(2)
-            .replace(".", ",")}`,
-        });
+    worksheet.addRow({ produto: "PRODUTO" });
+    for (
+      let ixPedido = 0;
+      ixPedido < listaProdutosRestaurante.length;
+      ixPedido++
+    ) {
+      worksheet.addRow({
+        produto: capitalize(listaProdutosRestaurante[ixPedido].Produto.nome),
+      });
+    }
+
+    worksheet.addRow({ produto: "VALOR:" });
+
+    let pedidosRestaurantes = [];
+    let pedidosRestaurantesTemporaria = [];
+    for (let item = 0; item < pedidos.length; item++) {
+      pedidosRestaurantesTemporaria.push(pedidos[item]);
+      if (item < pedidos.length - 1) {
+        if (pedidos[item].dataPedido !== pedidos[item + 1].dataPedido) {
+          pedidosRestaurantes.push(pedidosRestaurantesTemporaria);
+          pedidosRestaurantesTemporaria = [];
+        }
+      } else {
+        if (item === pedidos.length - 1) {
+          pedidosRestaurantes.push(pedidosRestaurantesTemporaria);
+        }
       }
     }
 
-    const quantidadeLinhas = 28 - quantidadeProdutos;
-    for (let row = 0; row < quantidadeLinhas; row++) {
-      worksheet.addRow({ quantidade: "" });
-    }
+    worksheet.mergeCells(
+      `A5:${arrayAlfabeto[pedidosRestaurantes.length + 2]}5`
+    );
 
-    worksheet.addRow({
-      valorUnidade: "Total",
-      valorTotalProduto: `R$ ${valorTotal.toFixed(2).replace(".", ",")}`,
-    });
-
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({
-      quantidade: "_________________",
-      produto: "",
-      valorUnidade: "_________________",
-      valorTotalProduto: "",
-    });
-    worksheet.mergeCells("A40:B40");
-    worksheet.mergeCells("C40:D40");
-
-    worksheet.addRow({
-      quantidade: "Comprador",
-      produto: "",
-      valorUnidade: "Vendedor",
-      valorTotalProduto: "",
-    });
-    worksheet.mergeCells("A41:B41");
-    worksheet.mergeCells("C41:D41");
-
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({ quantidade: "" });
-
-    worksheet.addRow({ quantidade: "Chácara Lima" });
-    worksheet.mergeCells("A45:D45");
-    worksheet.addRow({ quantidade: "Colônia Agrícola Samambaia Chácara 23" });
-    worksheet.mergeCells("A46:D46");
-    worksheet.addRow({ quantidade: "Tel. (61) 99983-5779" });
-    worksheet.mergeCells("A47:D47");
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({
-      quantidade: "Data:",
-      produto: dataBr(pedido[0].dataPedido, "/"),
-    });
-    worksheet.addRow({ quantidade: nomeRestauranteSelecionado });
-    worksheet.mergeCells("A51:D51");
-    worksheet.addRow({
-      quantidade: "Qt.",
-      produto: "Produtos",
-      valorUnidade: "Valor U",
-      valorTotalProduto: "Total",
-    });
-
-    for (const item of pedido) {
-      if (item.quantidadeProduto > 0) {
-        worksheet.addRow({
-          quantidade: item.quantidadeProduto,
-          produto: item.nomeProduto,
-          valorUnidade: `R$ ${item.valorProduto.replace(".", ",")}`,
-          valorTotalProduto: `R$ ${(item.quantidadeProduto * item.valorProduto)
-            .toFixed(2)
-            .replace(".", ",")}`,
-        });
+    let coluna = 0;
+    let quantidadeTotalProduto: number[] = [];
+    let valorTotalProduto: number[] = [];
+    let valorTotalDia: number[] = [];
+    let valorTotalPedido = 0;
+    let dataPedido = "";
+    let dia = "";
+    let mes = 0;
+    for (let item = 0; item < pedidosRestaurantes.length; item++) {
+      coluna++;
+      dia = pedidosRestaurantes[item][0].dataPedido.substring(8, 10);
+      mes = pedidosRestaurantes[item][0].dataPedido.substring(5, 7);
+      dataPedido = `${dia}/${arrayMeses[mes - 1]}`;
+      worksheet.getCell(`${arrayAlfabeto[coluna]}$6`).value = dataPedido;
+      valorTotalDia[item] = 0;
+      let ixLinha = 0;
+      for (
+        let ixProduto = 0;
+        ixProduto < listaProdutosRestaurante.length;
+        ixProduto++
+      ) {
+        ixLinha = ixProduto + 7;
+        let quantidadeProduto = 0;
+        let valorProduto = 0;
+        for (
+          let ixPedido = 0;
+          ixPedido < pedidosRestaurantes[item].length;
+          ixPedido++
+        ) {
+          if (
+            listaProdutosRestaurante[ixProduto].Produto.nome ===
+            pedidosRestaurantes[item][ixPedido].nome
+          ) {
+            quantidadeProduto =
+              pedidosRestaurantes[item][ixPedido].quantidadeProduto;
+            valorProduto =
+              pedidosRestaurantes[item][ixPedido].valorTotalProduto;
+          }
+        }
+        worksheet.getCell(`${arrayAlfabeto[coluna]}${ixLinha}`).value =
+          quantidadeProduto;
+        if (item === 0) {
+          quantidadeTotalProduto.push(quantidadeProduto);
+        } else {
+          quantidadeTotalProduto[ixProduto] += quantidadeProduto;
+        }
+        if (item === 0) {
+          valorTotalProduto.push(valorProduto);
+        } else {
+          valorTotalProduto[ixProduto] += valorProduto;
+        }
+        valorTotalDia[item] += valorProduto;
       }
+      valorTotalPedido += valorTotalDia[item];
+      worksheet.getCell(
+        `${arrayAlfabeto[coluna]}${listaProdutosRestaurante.length + 7}`
+      ).value = valorTotalDia[item];
     }
 
-    for (let row = 0; row < quantidadeLinhas; row++) {
-      worksheet.addRow({ quantidade: "" });
+    coluna++;
+    worksheet.getCell(`${arrayAlfabeto[coluna]}6`).value = "Total Unid.";
+    for (
+      let ixQuantidade = 0;
+      ixQuantidade < quantidadeTotalProduto.length;
+      ixQuantidade++
+    ) {
+      worksheet.getCell(`${arrayAlfabeto[coluna]}${ixQuantidade + 7}`).value =
+        quantidadeTotalProduto[ixQuantidade];
     }
 
-    worksheet.addRow({
-      valorUnidade: "Total",
-      valorTotalProduto: `R$ ${valorTotal.toFixed(2).replace(".", ",")}`,
-    });
+    coluna++;
+    worksheet.getCell(`${arrayAlfabeto[coluna]}6`).value = "Valor Total";
 
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({ quantidade: "" });
-    worksheet.addRow({
-      quantidade: "_________________",
-      produto: "",
-      valorUnidade: "_________________",
-      valorTotalProduto: "",
-    });
-    worksheet.mergeCells("A84:B84");
-    worksheet.mergeCells("C84:D84");
+    for (let ixValor = 0; ixValor < valorTotalProduto.length; ixValor++) {
+      worksheet.getCell(
+        `${arrayAlfabeto[coluna]}${ixValor + 7}`
+      ).value = `R$ ${valorTotalProduto[ixValor].toFixed(2).replace(".", ",")}`;
+    }
 
-    worksheet.addRow({
-      quantidade: "Comprador",
-      produto: "",
-      valorUnidade: "Vendedor",
-      valorTotalProduto: "",
-    });
-    worksheet.mergeCells("A85:B85");
-    worksheet.mergeCells("C85:D85");
+    worksheet.getCell(
+      `${arrayAlfabeto[coluna - 1]}${quantidadeTotalProduto.length + 7}`
+    ).value = `R$ ${valorTotalPedido.toFixed(2).replace(".", ",")}`;
 
-    worksheet.getRow(1).font = {
+    worksheet.mergeCells(
+      `${arrayAlfabeto[coluna - 1]}${quantidadeTotalProduto.length + 7}:${
+        arrayAlfabeto[coluna]
+      }${quantidadeTotalProduto.length + 7}`
+    );
+
+    // Titulo
+    worksheet.getRow(5).font = {
+      name: "Arial",
+      size: 18,
+      bold: true,
+    };
+    worksheet.getRow(5).alignment = {
+      vertical: "middle",
+      horizontal: "center",
+    };
+
+    // Descrição das colunas
+    worksheet.getRow(6).font = {
       name: "Arial",
       size: 11,
       bold: true,
     };
-    worksheet.getRow(1).alignment = {
-      vertical: "middle",
-      horizontal: "center",
-    };
-    worksheet.getRow(2).font = {
-      name: "Arial",
-      size: 9,
-    };
-    worksheet.getRow(2).alignment = {
-      vertical: "middle",
-      horizontal: "center",
-    };
-    worksheet.getRow(3).font = {
-      name: "Arial",
-      size: 9,
-    };
-    worksheet.getRow(3).alignment = {
+    worksheet.getRow(6).alignment = {
       vertical: "middle",
       horizontal: "center",
     };
 
-    for (let row = 6; row <= 41; row++) {
-      worksheet.getRow(row).font = {
+    // Nomes dos produtos
+    for (let row = 7; row <= quantidadeTotalProduto.length + 7; row++) {
+      worksheet.getCell(`${arrayAlfabeto[0]}${row}`).font = {
         name: "Arial",
-        size: 9,
-        bold: true,
+        size: 11,
       };
-      worksheet.getRow(row).alignment = {
-        vertical: "middle",
-        horizontal: "center",
-      };
-    }
-
-    for (let row = 9; row <= 36; row++) {
-      worksheet.getRow(row).height = 10.5;
-    }
-
-    for (let row = 8; row <= 37; row++) {
-      worksheet.getRow(row).alignment = {
+      worksheet.getCell(`${arrayAlfabeto[0]}${row}`).alignment = {
         vertical: "middle",
         horizontal: "left",
       };
     }
 
-    for (let row = 8; row <= 36; row++) {
-      worksheet.getCell(`A${row}`).border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
+    // Quantidades de produtos
+    for (let row = 7; row <= quantidadeTotalProduto.length + 7; row++) {
+      for (let column = 1; column <= pedidosRestaurantes.length + 1; column++) {
+        worksheet.getCell(`${arrayAlfabeto[column]}${row}`).font = {
+          name: "Arial",
+          size: 11,
+          bold: true,
+        };
+        worksheet.getCell(`${arrayAlfabeto[column]}${row}`).alignment = {
+          vertical: "middle",
+          horizontal: "center",
+        };
+      }
     }
 
-    for (let row = 8; row <= 36; row++) {
-      worksheet.getCell(`B${row}`).border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
-    }
-
-    for (let row = 8; row <= 36; row++) {
-      worksheet.getCell(`C${row}`).border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
-    }
-
-    for (let row = 8; row <= 37; row++) {
-      worksheet.getCell(`D${row}`).border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
-    }
-
-    worksheet.getRow(45).font = {
-      name: "Arial",
-      size: 11,
-      bold: true,
-    };
-    worksheet.getRow(45).alignment = {
-      vertical: "middle",
-      horizontal: "center",
-    };
-    worksheet.getRow(46).font = {
-      name: "Arial",
-      size: 9,
-    };
-    worksheet.getRow(46).alignment = {
-      vertical: "middle",
-      horizontal: "center",
-    };
-    worksheet.getRow(47).font = {
-      name: "Arial",
-      size: 9,
-    };
-    worksheet.getRow(47).alignment = {
-      vertical: "middle",
-      horizontal: "center",
-    };
-
-    for (let row = 50; row <= 85; row++) {
-      worksheet.getRow(row).font = {
+    // Valor total dos produtos
+    for (let row = 7; row <= quantidadeTotalProduto.length + 7; row++) {
+      worksheet.getCell(
+        `${arrayAlfabeto[pedidosRestaurantes.length + 2]}${row}`
+      ).font = {
         name: "Arial",
-        size: 9,
+        size: 11,
         bold: true,
       };
-      worksheet.getRow(row).alignment = {
-        vertical: "middle",
-        horizontal: "center",
-      };
-    }
-
-    for (let row = 53; row <= 80; row++) {
-      worksheet.getRow(row).height = 10.5;
-    }
-
-    for (let row = 52; row <= 81; row++) {
-      worksheet.getRow(row).alignment = {
+      worksheet.getCell(
+        `${arrayAlfabeto[pedidosRestaurantes.length + 2]}${row}`
+      ).alignment = {
         vertical: "middle",
         horizontal: "left",
       };
     }
 
-    for (let row = 52; row <= 80; row++) {
-      worksheet.getCell(`A${row}`).border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
+    // VALOR:
+    worksheet.getCell(
+      `${arrayAlfabeto[0]}${quantidadeTotalProduto.length + 7}`
+    ).font = {
+      name: "Arial",
+      size: 11,
+      bold: true,
+    };
+    worksheet.getCell(
+      `${arrayAlfabeto[0]}${quantidadeTotalProduto.length + 7}`
+    ).alignment = {
+      vertical: "middle",
+      horizontal: "left",
+    };
+
+    // Valores
+    for (let column = 1; column <= pedidosRestaurantes.length + 2; column++) {
+      worksheet.getCell(
+        `${arrayAlfabeto[column]}${quantidadeTotalProduto.length + 7}`
+      ).font = {
+        name: "Arial",
+        size: 11,
+        bold: true,
+      };
+      worksheet.getCell(
+        `${arrayAlfabeto[column]}${quantidadeTotalProduto.length + 7}`
+      ).alignment = {
+        vertical: "middle",
+        horizontal: "center",
       };
     }
 
-    for (let row = 52; row <= 80; row++) {
-      worksheet.getCell(`B${row}`).border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
+    // Pedidos
+    for (let column = 1; column <= pedidosRestaurantes.length; column++) {
+      worksheet.getColumn(arrayAlfabeto[column]).width = 7.14;
     }
 
-    for (let row = 52; row <= 80; row++) {
-      worksheet.getCell(`C${row}`).border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
-    }
+    // Total Unid.
+    worksheet.getColumn(
+      arrayAlfabeto[pedidosRestaurantes.length + 1]
+    ).width = 11.72;
 
-    for (let row = 52; row <= 81; row++) {
-      worksheet.getCell(`D${row}`).border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" },
-      };
-    }
+    // Valor Total
+    worksheet.getColumn(
+      arrayAlfabeto[pedidosRestaurantes.length + 2]
+    ).width = 18.58;
 
-    for (let row = 1; row <= 8; row++) {
-      worksheet.getRow(row).height = 10.25;
+    for (let row = 5; row <= quantidadeTotalProduto.length + 7; row++) {
+      for (let column = 0; column <= pedidosRestaurantes.length + 2; column++) {
+        worksheet.getCell(`${arrayAlfabeto[column]}${row}`).border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      }
     }
-
-    for (let row = 37; row <= 52; row++) {
-      worksheet.getRow(row).height = 10.25;
-    }
-
-    for (let row = 81; row <= 85; row++) {
-      worksheet.getRow(row).height = 10.25;
-    }
-
-    worksheet.getRow(42).height = 5;
-    worksheet.getRow(43).height = 5;
 
     // Write to file
     workbook.xlsx.writeBuffer().then((buffer: ExcelJS.Buffer) => {

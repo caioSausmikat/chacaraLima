@@ -263,25 +263,6 @@ function BottomTabNavigator({ route }) {
           }}
         />
       )}
-      {route.params.usuario.tiposUsuariosId === 1 && (
-        <BottomTab.Screen
-          name="Relatorios"
-          component={RelatoriosScreen}
-          initialParams={{ usuarioLogado: route.params.usuario }}
-          options={{
-            headerTitle: "",
-            headerTransparent: true,
-            tabBarIcon: ({ focused, color, size }) => {
-              let iconName;
-
-              iconName = focused ? "book" : "book-outline";
-
-              // You can return any component that you like here!
-              return <Ionicons name={iconName} size={size} color={color} />;
-            },
-          }}
-        />
-      )}
       {route.params.usuario.tiposUsuariosId === 2 && (
         <BottomTab.Screen
           name="Pedidos"
@@ -313,6 +294,26 @@ function BottomTabNavigator({ route }) {
               let iconName;
 
               iconName = focused ? "document-text" : "document-text-outline";
+
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          }}
+        />
+      )}
+      {(route.params.usuario.tiposUsuariosId === 1 ||
+        route.params.usuario.tiposUsuariosId === 3) && (
+        <BottomTab.Screen
+          name="Relatorios"
+          component={RelatoriosScreen}
+          initialParams={{ usuarioLogado: route.params.usuario }}
+          options={{
+            headerTitle: "",
+            headerTransparent: true,
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+
+              iconName = focused ? "book" : "book-outline";
 
               // You can return any component that you like here!
               return <Ionicons name={iconName} size={size} color={color} />;

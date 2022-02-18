@@ -36,7 +36,7 @@ let expo = new Expo();
 app.post("/login", async (req, res) => {
   let response = await usuarios
     .findOne({
-      where: { usuario: req.body.usuario, senha: req.body.senha },
+      where: { usuario: req.body.usuario, senha: MD5(req.body.senha) },
     })
     .catch((err) => {
       console.log(err);
@@ -60,41 +60,6 @@ app.post("/verificaUsuarioNovo", async (req, res) => {
     res.send(JSON.stringify("erro"));
   } else {
     res.send(response);
-  }
-});
-
-app.post("/verifyPass", async (req, res) => {
-  let response = await usuarios.findOne({
-    where: { id: req.body.id, senha: req.body.senhaAntiga },
-  });
-  if (response === null) {
-    res.send({
-      mensagem: JSON.stringify("Senha antiga não confere"),
-      erro: true,
-    });
-  } else {
-    if (req.body.novaSenha === req.body.senhaAntiga) {
-      response.senha = req.body.novaSenha;
-      response.save();
-      res.send({
-        mensagem: JSON.stringify("Senha nova igual a senha antiga!"),
-        erro: true,
-      });
-    } else {
-      if (req.body.novaSenha === req.body.confNovaSenha) {
-        response.senha = req.body.novaSenha;
-        response.save();
-        res.send({
-          mensagem: JSON.stringify("Senha atualizada com sucesso!"),
-          erro: false,
-        });
-      } else {
-        res.send({
-          mensagem: JSON.stringify("Nova senha e confirmação não conferem!"),
-          erro: true,
-        });
-      }
-    }
   }
 });
 
@@ -135,7 +100,7 @@ app.post("/listaTodosProdutosRestaurante", async (req, res) => {
     .findAll({
       include: [
         {
-          model: produtos
+          model: produtos,
         },
       ],
       where: { restauranteId: req.body.codigoRestaurante },
@@ -515,7 +480,7 @@ app.post("/redefinirSenha", async (req, res) => {
     .findOne({
       where: {
         usuario: req.body.usuario,
-        senha: req.body.senhaAtual,
+        senha: MD5(req.body.senhaAtual),
       },
     })
     .catch((err) => {
@@ -533,7 +498,7 @@ app.post("/redefinirSenha", async (req, res) => {
       .catch((err) => {
         console.log(err);
       });
-    response[0].senha = req.body.senhaNova;
+    response[0].senha = MD5(req.body.senhaNova);
     response[0].updateAt = new Date();
     response[0].save();
     res.send(true);
@@ -551,7 +516,7 @@ app.post("/criarSenha", async (req, res) => {
     .catch((err) => {
       console.log(err);
     });
-  response[0].senha = req.body.senhaNova;
+  response[0].senha = MD5(req.body.senhaNova);
   response[0].updateAt = new Date();
   response[0].save();
   res.send(true);

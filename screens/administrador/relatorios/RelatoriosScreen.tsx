@@ -18,6 +18,7 @@ import dataBr from "../../../functions/dataBr";
 import gerarRelatorioExcel from "../../../functions/gerarRelatorioExcel";
 import * as Sharing from "expo-sharing";
 import moment from "moment";
+import { TabRouter } from "@react-navigation/native";
 
 interface RestauranteDropdownList {
   label: string;
@@ -70,6 +71,8 @@ export default function RelatoriosScreen(props: any) {
   const [showDatePickerDataFim, setShowDatePickerDataFim] = useState(false);
 
   const [pedidoDataRestaurante, setPedidoDataRestaurante] = useState(false);
+
+  const [nomeRestaurante, setNomeRestaurante] = useState("");
 
   useEffect(() => {
     buscarDadosIniciais();
@@ -145,8 +148,24 @@ export default function RelatoriosScreen(props: any) {
           value: item.id,
         });
       }
-      setCodigoRestauranteSelecionado(listaRestaurantes[0].value);
-      return listaRestaurantes[0].value;
+      if (props.route.params.usuarioLogado.tiposUsuariosId === 1) {
+        setCodigoRestauranteSelecionado(listaRestaurantes[0].value);
+        return listaRestaurantes[0].value;
+      } else {
+        if (props.route.params.usuarioLogado.tiposUsuariosId === 3) {
+          setCodigoRestauranteSelecionado(
+            props.route.params.usuarioLogado.restaurantesId
+          );
+          for (const item of listaRestaurantes) {
+            if (
+              item.value === props.route.params.usuarioLogado.restaurantesId
+            ) {
+              setNomeRestaurante(item.label);
+            }
+          }
+          return props.route.params.usuarioLogado.restaurantesId;
+        }
+      }
     } else {
       setmostrarListaRestaurantes(false);
       return [];
@@ -170,7 +189,7 @@ export default function RelatoriosScreen(props: any) {
   }
 
   //Busca lista de produtos de restaurante selecionado
-  function buscarListaProdutosRestauranteSelecionado(restauranteId: number) {
+  function buscarListaProdutos(restauranteId: number) {
     return fetch(`${config.urlRoot}listaTodosProdutosRestaurante`, {
       method: "POST",
       headers: {
@@ -270,9 +289,7 @@ export default function RelatoriosScreen(props: any) {
         nomeRestauranteSelecionado = restaurante.label;
     }
     const buscarListaProdutosRestauranteSelecionadoResponse =
-      await buscarListaProdutosRestauranteSelecionado(
-        codigoRestauranteSelecionado
-      );
+      await buscarListaProdutos(codigoRestauranteSelecionado);
     const jsonBuscarListaProdutosRestauranteSelecionadoResponse =
       await buscarListaProdutosRestauranteSelecionadoResponse.json();
 
@@ -287,7 +304,9 @@ export default function RelatoriosScreen(props: any) {
     const shareableExcelUri: string = await gerarRelatorioExcel(
       nomeRestauranteSelecionado,
       jsonBuscarRelatorioRestauranteDatasResponse,
-      jsonBuscarListaProdutosRestauranteSelecionadoResponse
+      jsonBuscarListaProdutosRestauranteSelecionadoResponse,
+      dataInicio,
+      dataFim
     );
     Sharing.shareAsync(shareableExcelUri, {
       mimeType:
@@ -348,27 +367,48 @@ export default function RelatoriosScreen(props: any) {
             </View>
           </TouchableOpacity>
 
-          <DropDownPicker
-            zIndex={3000}
-            style={[
-              styles.dropdownPickerPedidosStyle,
-              { width: "45%", marginLeft: 5 },
-            ]}
-            open={openDropDownRestaurantes}
-            value={codigoRestauranteSelecionado}
-            items={listaRestaurantes}
-            setOpen={setOpenDropDownRestaurantes}
-            setValue={setCodigoRestauranteSelecionado}
-            placeholder="Selecione o restaurante"
-            dropDownContainerStyle={{
-              borderColor: "green",
-              width: "45%",
-              marginLeft: 5,
-            }}
-            onChangeValue={() => {
-              atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-            }}
-          />
+          {props.route.params.usuarioLogado.tiposUsuariosId === 1 && (
+            <DropDownPicker
+              zIndex={3000}
+              style={[
+                styles.dropdownPickerPedidosStyle,
+                { width: "45%", marginLeft: 5 },
+              ]}
+              open={openDropDownRestaurantes}
+              value={codigoRestauranteSelecionado}
+              items={listaRestaurantes}
+              setOpen={setOpenDropDownRestaurantes}
+              setValue={setCodigoRestauranteSelecionado}
+              placeholder="Selecione o restaurante"
+              dropDownContainerStyle={{
+                borderColor: "green",
+                width: "45%",
+                marginLeft: 5,
+              }}
+              onChangeValue={() => {
+                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+              }}
+            />
+          )}
+          {props.route.params.usuarioLogado.tiposUsuariosId === 3 && (
+            <View
+              style={[
+                styles.pedidosData,
+                { width: "42%", borderColor: "gray" },
+              ]}
+            >
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: "#418ac7",
+                  alignSelf: "center",
+                  fontSize: 14,
+                }}
+              >
+                {nomeRestaurante}
+              </Text>
+            </View>
+          )}
         </View>
       )}
       <View>
@@ -403,7 +443,15 @@ export default function RelatoriosScreen(props: any) {
         />
       )}
 
-      {pedidoDataRestaurante == true && (
+      {listaProdutosRestaurante.length === 0 && (
+        <View style={styles.mensagemSemPedidoContainer}>
+          <Text style={styles.mensageSemPedidoText}>
+            Nenhum pedido no período selecionado.
+          </Text>
+        </View>
+      )}
+
+      {pedidoDataRestaurante == true && listaProdutosRestaurante.length > 0 && (
         <View
           style={{
             flexDirection: "row",

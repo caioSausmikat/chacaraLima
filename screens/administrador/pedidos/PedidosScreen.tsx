@@ -361,6 +361,12 @@ export default function PedidosScreen(props: any) {
   };
 
   const onPressTodosPedidosHandler = () => {
+    if (todosPedidos == false) {
+      setNomeUsuarioPedido("");
+    } else {
+      atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+    }
+
     setTodosPedidos(!todosPedidos);
   };
 

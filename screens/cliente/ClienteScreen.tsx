@@ -357,27 +357,24 @@ export default function ClienteScreen(props: any) {
           justifyContent: "center",
         }}
       >
-        <TouchableOpacity onPress={onPressDateHandler}>
-          <Ionicons
-            style={{ color: "#418ac7" }}
-            name="calendar"
-            size={40}
-            title="Show date picker!"
-          />
+        <TouchableOpacity
+          onPress={onPressDateHandler}
+          style={[styles.pedidosData, { width: "25%" }]}
+        >
+          <View>
+            <Text
+              style={{
+                fontWeight: "bold",
+                color: "#418ac7",
+                alignSelf: "center",
+                fontSize: 14,
+              }}
+            >
+              {dataBr(dataPedido, "/")}
+            </Text>
+          </View>
         </TouchableOpacity>
-        <View style={[styles.pedidosData, { width: "25%" }]}>
-          <Text
-            style={{
-              fontWeight: "bold",
-              color: "#418ac7",
-              alignSelf: "center",
-              fontSize: 14,
-            }}
-          >
-            {dataBr(dataPedido, "/")}
-          </Text>
-        </View>
-        <View style={[styles.pedidosData, { width: "50%" }]}>
+        <View style={[styles.pedidosData, { width: "60%" }]}>
           <Text
             style={{
               fontWeight: "bold",

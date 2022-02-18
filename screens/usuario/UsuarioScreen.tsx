@@ -18,6 +18,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import dataBr from "../../functions/dataBr";
 import gerarPedidoExcel from "../../functions/gerarPedidoExcel";
+import gerarTodosPedidoDataExcel from "../../functions/gerarTodosPedidoDataExcel";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Sharing from "expo-sharing";
@@ -81,6 +82,8 @@ export default function UsuarioScreen(props: any) {
   );
   const [show, setShow] = useState(false);
   const [showButtons, setShowButtons] = useState(true);
+
+  const [todosPedidos, setTodosPedidos] = useState(false);
 
   const [expoPushToken, setExpoPushToken] = useState(null);
 
@@ -363,31 +366,74 @@ export default function UsuarioScreen(props: any) {
     setShow(!show);
   };
 
-  async function shareExcel() {
-    let nomeRestauranteSelecionado = "";
-    for (const restaurante of listaRestaurantes) {
-      if (restaurante.value === codigoRestauranteSelecionado)
-        [(nomeRestauranteSelecionado = restaurante.label)];
+  const onPressTodosPedidosHandler = () => {
+    if (todosPedidos == false) {
+      setNomeUsuarioPedido("");
+    } else {
+      atualizaProdutosRestaurante(codigoRestauranteSelecionado);
     }
 
-    const shareableExcelUri: string = await gerarPedidoExcel(
-      pedido,
-      listaProdutosRestaurante,
-      nomeRestauranteSelecionado
-    );
-    Sharing.shareAsync(shareableExcelUri, {
-      mimeType:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
-      dialogTitle: "Your dialog title here", // Android and Web
-      UTI: "com.microsoft.excel.xlsx", // iOS
-    }).catch((error) => {
-      console.error("Error", error);
+    setTodosPedidos(!todosPedidos);
+  };
+
+  async function shareExcel() {
+    let shareableExcelUri = "";
+    if (todosPedidos == true) {
+      const buscarTodosPedidosDataResponse = await buscarTodosPedidosData();
+      const jsonBuscarTodosPedidosDataResponse =
+        await buscarTodosPedidosDataResponse.json();
+
+      if (jsonBuscarTodosPedidosDataResponse.length > 0) {
+        shareableExcelUri = await gerarTodosPedidoDataExcel(
+          jsonBuscarTodosPedidosDataResponse,
+          dataBr(dataPedido, "-")
+        );
+      } else {
+        Alert.alert("Nenhum pedido na data selecionada!");
+      }
+    } else {
+      let nomeRestauranteSelecionado = "";
+      for (const restaurante of listaRestaurantes) {
+        if (restaurante.value === codigoRestauranteSelecionado)
+          [(nomeRestauranteSelecionado = restaurante.label)];
+      }
+
+      shareableExcelUri = await gerarPedidoExcel(
+        pedido,
+        listaProdutosRestaurante,
+        nomeRestauranteSelecionado
+      );
+    }
+
+    if (shareableExcelUri !== "") {
+      Sharing.shareAsync(shareableExcelUri, {
+        mimeType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Android
+        dialogTitle: "Your dialog title here", // Android and Web
+        UTI: "com.microsoft.excel.xlsx", // iOS
+      }).catch((error) => {
+        console.error("Error", error);
+      });
+    }
+  }
+
+  //Busca todos os pedidos de todos os restaurantes na data selecionada
+  function buscarTodosPedidosData() {
+    return fetch(`${config.urlRoot}geraRecibosPedidosData`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dataPedido: dataPedido,
+      }),
     });
   }
 
   return (
     <View style={styles.container}>
-      {pedido.length > 0 && nomeUsuarioPedido !== "" && (
+      {pedido.length > 0 && nomeUsuarioPedido !== "" && todosPedidos == false && (
         <View style={{ justifyContent: "center", marginTop: 10 }}>
           <Text
             style={{
@@ -410,44 +456,77 @@ export default function UsuarioScreen(props: any) {
             nomeUsuarioPedido !== "" ? { marginTop: 13 } : { marginTop: 40 },
           ]}
         >
-          <TouchableOpacity onPress={onPressDateHandler}>
+          <TouchableOpacity
+            style={{ marginLeft: 20 }}
+            onPress={onPressTodosPedidosHandler}
+          >
             <Ionicons
-              style={{ color: "#418ac7", marginLeft: 20 }}
-              name="calendar"
+              style={{ color: "#418ac7" }}
+              name={todosPedidos ? "file-tray-full" : "file-tray"}
               size={40}
-              title="Show date picker!"
             />
           </TouchableOpacity>
-          <View style={styles.pedidosData}>
-            <Text
-              style={{
-                fontWeight: "bold",
-                color: "#418ac7",
-                alignSelf: "center",
-                fontSize: 14,
-              }}
-            >
-              {dataBr(dataPedido, "/")}
-            </Text>
-          </View>
 
-          <DropDownPicker
-            zIndex={3000}
-            style={[styles.dropdownPickerPedidosStyle, { width: "50%" }]}
-            open={openDropDownRestaurantes}
-            value={codigoRestauranteSelecionado}
-            items={listaRestaurantes}
-            setOpen={setOpenDropDownRestaurantes}
-            setValue={setCodigoRestauranteSelecionado}
-            placeholder="Selecione o restaurante"
-            dropDownContainerStyle={{
-              borderColor: "green",
-              width: "50%",
-            }}
-            onChangeValue={() => {
-              atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-            }}
-          />
+          <TouchableOpacity onPress={onPressDateHandler}>
+            <View
+              style={[
+                styles.pedidosData,
+                {
+                  borderColor: "green",
+                  paddingBottom: "12%",
+                  paddingTop: "12%",
+                },
+              ]}
+            >
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: "#418ac7",
+                  alignSelf: "center",
+                  fontSize: 14,
+                }}
+              >
+                {dataBr(dataPedido, "/")}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          {todosPedidos == false && (
+            <DropDownPicker
+              zIndex={3000}
+              style={[
+                styles.dropdownPickerPedidosStyle,
+                { width: "50%", marginLeft: 5 },
+              ]}
+              open={openDropDownRestaurantes}
+              value={codigoRestauranteSelecionado}
+              items={listaRestaurantes}
+              setOpen={setOpenDropDownRestaurantes}
+              setValue={setCodigoRestauranteSelecionado}
+              placeholder="Selecione o restaurante"
+              dropDownContainerStyle={{
+                borderColor: "green",
+                width: "50%",
+              }}
+              onChangeValue={() => {
+                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+              }}
+            />
+          )}
+          {todosPedidos == true && (
+            <View style={[styles.pedidosData, { width: "45%", height: 55 }]}>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: "#418ac7",
+                  alignSelf: "center",
+                  fontSize: 14,
+                }}
+              >
+                Todos os pedidos
+              </Text>
+            </View>
+          )}
         </View>
       )}
       <View>
@@ -462,7 +541,7 @@ export default function UsuarioScreen(props: any) {
         )}
       </View>
 
-      {listaProdutosRestaurante.length > 0 && (
+      {listaProdutosRestaurante.length > 0 && todosPedidos == false && (
         <FlatList
           data={listaProdutosRestaurante}
           extraData={atualizaFlatList}
@@ -479,7 +558,8 @@ export default function UsuarioScreen(props: any) {
 
       {dataPedido !==
         moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10) &&
-        pedidoDataRestaurante == false && (
+        pedidoDataRestaurante == false &&
+        todosPedidos == false && (
           <View style={styles.mensagemSemPedidoContainer}>
             <Text style={styles.mensageSemPedidoText}>
               Nenhum pedido encontrado na data e no restaurante selecionado.
@@ -496,24 +576,56 @@ export default function UsuarioScreen(props: any) {
           }}
         >
           {dataPedido ===
-            moment()
-              .subtract(3, "hour")
-              .add(1, "days")
-              .toJSON()
-              .slice(0, 10) && (
-            <TouchableOpacity
-              style={[styles.buscaPedidoButton, { backgroundColor: "#4b9666" }]}
-              onPress={() => {
-                atualizaProdutosRestaurante(codigoRestauranteSelecionado);
-              }}
-            >
-              <Text style={styles.confirmaRedefinicaoSenhaText}>
-                Buscar Pedido
-              </Text>
-            </TouchableOpacity>
-          )}
+            moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10) &&
+            todosPedidos == false && (
+              <TouchableOpacity
+                style={[
+                  styles.buscaPedidoButton,
+                  { backgroundColor: "#4b9666" },
+                ]}
+                onPress={() => {
+                  atualizaProdutosRestaurante(codigoRestauranteSelecionado);
+                }}
+              >
+                <Text style={styles.confirmaRedefinicaoSenhaText}>
+                  Buscar Pedido
+                </Text>
+              </TouchableOpacity>
+            )}
 
-          {pedido.length > 0 && pedidoDataRestaurante == true && (
+          {pedido.length > 0 &&
+            pedidoDataRestaurante == true &&
+            todosPedidos == false && (
+              <TouchableOpacity
+                style={styles.gerarExcelButton}
+                onPress={() => {
+                  shareExcel();
+                }}
+              >
+                <Image
+                  style={{ width: 50, height: 50 }}
+                  source={require("../../assets/images/excel.icon.jpg")}
+                />
+              </TouchableOpacity>
+            )}
+
+          {dataPedido ===
+            moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10) &&
+            pedidoDataRestaurante == true &&
+            todosPedidos == false && (
+              <TouchableOpacity
+                style={styles.buscaPedidoButton}
+                onPress={() => {
+                  salvarPedido();
+                }}
+              >
+                <Text style={styles.confirmaRedefinicaoSenhaText}>
+                  Salvar Pedido
+                </Text>
+              </TouchableOpacity>
+            )}
+
+          {todosPedidos == true && (
             <TouchableOpacity
               style={styles.gerarExcelButton}
               onPress={() => {
@@ -526,21 +638,6 @@ export default function UsuarioScreen(props: any) {
               />
             </TouchableOpacity>
           )}
-
-          {dataPedido ===
-            moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10) &&
-            pedidoDataRestaurante == true && (
-              <TouchableOpacity
-                style={styles.buscaPedidoButton}
-                onPress={() => {
-                  salvarPedido();
-                }}
-              >
-                <Text style={styles.confirmaRedefinicaoSenhaText}>
-                  Salvar Pedido
-                </Text>
-              </TouchableOpacity>
-            )}
         </View>
       )}
     </View>

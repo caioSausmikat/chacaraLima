@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   pedidosData: {
-    borderColor: "gray",
+    borderColor: "green",
     borderWidth: 1,
     borderRadius: 5,
     marginLeft: 5,
