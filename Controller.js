@@ -483,13 +483,14 @@ app.post("/redefinirSenha", async (req, res) => {
     .findOne({
       where: {
         usuario: req.body.usuario,
-        senha: req.body.senhaAtual,
       },
     })
     .catch((err) => {
       console.log(err);
     });
-  if (verificaSenhaAtualResponse === null) {
+    const plaintextPassword = req.body.senhaAtual;
+    const result = bcrypt.compareSync(plaintextPassword, verificaSenhaAtualResponse.senha);
+    if (result == false) {
     res.send(false);
   } else {
     let response = await usuarios
