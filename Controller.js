@@ -36,7 +36,7 @@ let expo = new Expo();
 app.post("/login", async (req, res) => {
   let response = await usuarios
     .findOne({
-      where: { usuario: req.body.usuario, senha: MD5(req.body.senha) },
+      where: { usuario: req.body.usuario, senha: req.body.senha },
     })
     .catch((err) => {
       console.log(err);
@@ -480,7 +480,7 @@ app.post("/redefinirSenha", async (req, res) => {
     .findOne({
       where: {
         usuario: req.body.usuario,
-        senha: MD5(req.body.senhaAtual),
+        senha: req.body.senhaAtual,
       },
     })
     .catch((err) => {
@@ -498,7 +498,7 @@ app.post("/redefinirSenha", async (req, res) => {
       .catch((err) => {
         console.log(err);
       });
-    response[0].senha = MD5(req.body.senhaNova);
+    response[0].senha = req.body.senhaNova;
     response[0].updateAt = new Date();
     response[0].save();
     res.send(true);
@@ -516,7 +516,7 @@ app.post("/criarSenha", async (req, res) => {
     .catch((err) => {
       console.log(err);
     });
-  response[0].senha = MD5(req.body.senhaNova);
+  response[0].senha = req.body.senhaNova;
   response[0].updateAt = new Date();
   response[0].save();
   res.send(true);
