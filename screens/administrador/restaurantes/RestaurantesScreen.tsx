@@ -16,7 +16,7 @@ import RestaurantesItemScreen from "./RestaurantesItemScreen";
 import { Ionicons } from "@expo/vector-icons";
 import capitalize from "../../../functions/capitalize";
 import { TextInputMask } from "react-native-masked-text";
-import * as moment from "moment-timezone";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface RestauranteDropdownList {
   label: string;
@@ -336,7 +336,7 @@ export default function RestaurantesScreen({
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {mostrarListaRestaurantes == true && (
         <View
           style={[
@@ -428,6 +428,6 @@ export default function RestaurantesScreen({
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

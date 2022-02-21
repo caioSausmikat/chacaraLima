@@ -11,6 +11,7 @@ import {
 import { styles } from "../../../assets/styles/styles";
 import config from "../../../config/config.json";
 import DropDownPicker from "react-native-dropdown-picker";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface TiposUsuariosDropdownList {
   label: string;
@@ -275,7 +276,7 @@ export default function EditarUsuarioScreen(props: any) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={[styles.textFormContainer, { marginTop: 10 }]}>
         Usuário:{" "}
       </Text>
@@ -377,6 +378,6 @@ export default function EditarUsuarioScreen(props: any) {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

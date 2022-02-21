@@ -13,16 +13,10 @@ import {
   FormControl,
   WarningOutlineIcon,
 } from "native-base";
-import {
-  View,
-  KeyboardAvoidingView,
-  Image,
-  Platform,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { View, Image, Text, TouchableOpacity } from "react-native";
 import { styles } from "../assets/styles/styles";
 import config from "../config/config.json";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Login({ navigation }: RootStackScreenProps<"Login">) {
   const [mostrarErroUsuarioSenha, setMostrarErroUsuarioSenha] = useState(false);
@@ -139,10 +133,7 @@ export default function Login({ navigation }: RootStackScreenProps<"Login">) {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.container, { justifyContent: "center" }]}
-    >
+    <SafeAreaView style={[styles.container, { justifyContent: "center" }]}>
       <View>
         <Image
           source={require("../assets/images/logomarca.png")}
@@ -241,6 +232,6 @@ export default function Login({ navigation }: RootStackScreenProps<"Login">) {
           </Button>
         </Stack>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

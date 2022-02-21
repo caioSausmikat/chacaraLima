@@ -13,9 +13,9 @@ import { FlatList } from "native-base";
 import ClienteItemScreen from "./ClienteItemScreen";
 import capitalize from "../../functions/capitalize";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
 import dataBr from "../../functions/dataBr";
 import moment from "moment";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface RestauranteDropdownList {
   label: string;
@@ -339,7 +339,7 @@ export default function ClienteScreen(props: any) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {mostraMensagemClienteSemRestauranteVinculado == true && (
         <View style={styles.mensagemSemPedidoContainer}>
           <Text style={styles.mensageSemPedidoText}>
@@ -445,6 +445,6 @@ export default function ClienteScreen(props: any) {
             </TouchableOpacity>
           </View>
         )}
-    </View>
+    </SafeAreaView>
   );
 }

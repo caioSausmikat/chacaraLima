@@ -23,6 +23,7 @@ import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Sharing from "expo-sharing";
 import moment from "moment";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface RestauranteDropdownList {
   label: string;
@@ -426,7 +427,7 @@ export default function PedidosScreen(props: any) {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {pedido.length > 0 && nomeUsuarioPedido !== "" && todosPedidos == false && (
         <View style={{ justifyContent: "center", marginTop: 10 }}>
           <Text
@@ -467,8 +468,10 @@ export default function PedidosScreen(props: any) {
                 styles.pedidosData,
                 {
                   borderColor: "green",
-                  paddingBottom: "17%",
-                  paddingTop: "17%",
+                  paddingBottom: "20%",
+                  paddingTop: "20%",
+                  marginLeft: 5,
+                  marginRight: 5,
                 },
               ]}
             >
@@ -625,6 +628,6 @@ export default function PedidosScreen(props: any) {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

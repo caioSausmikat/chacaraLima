@@ -19,6 +19,7 @@ import {
 } from "react-native";
 import { styles } from "../../assets/styles/styles";
 import config from "../../config/config.json";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RedefinirSenhaScreen(props: any) {
   const [mostrarErroUsuarioSenha, setMostrarErroUsuarioSenha] = useState(false);
@@ -189,10 +190,7 @@ export default function RedefinirSenhaScreen(props: any) {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container}>
       <View>
         <View style={{ marginTop: 40 }} />
 
@@ -378,6 +376,6 @@ export default function RedefinirSenhaScreen(props: any) {
           )}
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

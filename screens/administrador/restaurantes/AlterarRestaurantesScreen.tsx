@@ -14,6 +14,7 @@ import { FlatList } from "native-base";
 import AlterarRestaurantesItemScreen from "./AlterarRestaurantesItemScreen";
 import { Ionicons } from "@expo/vector-icons";
 import capitalize from "../../../functions/capitalize";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Restaurante {
   restauranteId: number;
@@ -162,7 +163,7 @@ export default function AlterarRestaurantesScreen({
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={{ marginTop: 40 }}></View>
       {mostrarRestaurantes == true && (
         <FlatList
@@ -198,6 +199,6 @@ export default function AlterarRestaurantesScreen({
           <Ionicons name="ios-add-circle" size={40} color="green" />
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

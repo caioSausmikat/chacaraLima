@@ -47,7 +47,7 @@ app.post("/login", async (req, res) => {
   if (result == false) {
     res.send(JSON.stringify("erro"));
   } else {
-    res.send(response);
+    res.send({usuario: response.usuario, senha: plaintextPassword});
   }
 });
 
@@ -571,16 +571,6 @@ app.post("/detalhaPedido", async (req, res) => {
       listaFinalResponse.push(itemRestaurante);
     }
   }
-  // } else {
-  //   const response = await sequelize.query(
-  //     `SELECT A.restauranteId, A.produtoId, FORMAT(A.valorProduto,2) AS valorProduto, A.dataPedido, A.usuarioId, A.nomeUsuario, A.quantidadeProduto, B.nome FROM pedidos A, produtos B WHERE A.produtoId = B.id AND A.restauranteId = ${req.body.codigoRestaurante} AND A.dataPedido = '${req.body.dataPedido}'`,
-  //     { raw: true }
-  //   );
-
-  //   for (const itemRestaurante of response[0]) {
-  //     listaFinalResponse.push(itemRestaurante);
-  //   }
-  // }
   res.send(JSON.stringify(listaFinalResponse));
 });
 

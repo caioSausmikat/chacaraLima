@@ -10,15 +10,10 @@ import {
   FormControl,
   WarningOutlineIcon,
 } from "native-base";
-import {
-  View,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  Alert,
-} from "react-native";
+import { View, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { styles } from "../../assets/styles/styles";
 import config from "../../config/config.json";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CriarSenhaScreen(props: any) {
   const [mostrarErroUsuarioSenha, setMostrarErroUsuarioSenha] = useState(false);
@@ -62,10 +57,7 @@ export default function CriarSenhaScreen(props: any) {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container}>
       <View style={{ marginTop: 40, alignItems: "center" }}>
         <Input
           w={{
@@ -159,6 +151,6 @@ export default function CriarSenhaScreen(props: any) {
           Criar Senha
         </Button>
       </Stack>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

@@ -5,15 +5,13 @@ import {
   TouchableOpacity,
   Keyboard,
   Alert,
-  KeyboardAvoidingView,
 } from "react-native";
-import { RootTabScreenProps } from "../../../types";
 import { styles } from "../../../assets/styles/styles";
 import config from "../../../config/config.json";
 import { FlatList } from "native-base";
 import UsuariosItemScreen from "./UsuariosItemScreen";
 import { Ionicons } from "@expo/vector-icons";
-import capitalize from "../../../functions/capitalize";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Usuario {
   usuarioId: number;
@@ -151,7 +149,7 @@ export default function UsuariosScreen(props: any) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={{ marginTop: 40 }}></View>
       {mostrarUsuarios == true && (
         <FlatList
@@ -187,6 +185,6 @@ export default function UsuariosScreen(props: any) {
           <Ionicons name="ios-add-circle" size={40} color="green" />
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

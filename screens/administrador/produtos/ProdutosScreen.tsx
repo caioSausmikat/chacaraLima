@@ -14,7 +14,7 @@ import { FlatList } from "native-base";
 import ProdutosItemScreen from "./ProdutosItemScreen";
 import { Ionicons } from "@expo/vector-icons";
 import capitalize from "../../../functions/capitalize";
-import { color } from "native-base/lib/typescript/theme/styled-system";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Produto {
   key: string;
@@ -162,7 +162,7 @@ export default function ProdutosScreen({
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={{ marginTop: 40 }}></View>
       <FlatList
         data={listaProdutos}
@@ -195,6 +195,6 @@ export default function ProdutosScreen({
           <Ionicons name="ios-add-circle" size={40} color="green" />
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

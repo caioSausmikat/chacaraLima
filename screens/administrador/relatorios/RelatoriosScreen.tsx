@@ -18,7 +18,7 @@ import dataBr from "../../../functions/dataBr";
 import gerarRelatorioExcel from "../../../functions/gerarRelatorioExcel";
 import * as Sharing from "expo-sharing";
 import moment from "moment";
-import { TabRouter } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface RestauranteDropdownList {
   label: string;
@@ -276,10 +276,13 @@ export default function RelatoriosScreen(props: any) {
 
   const onPressDataInicioHandler = () => {
     setShowDatePickerDataInicio(!showDatePickerDataInicio);
+    if (showDatePickerDataFim) setShowDatePickerDataFim(!showDatePickerDataFim);
   };
 
   const onPressDataFimHandler = () => {
     setShowDatePickerDataFim(!showDatePickerDataFim);
+    if (showDatePickerDataInicio)
+      setShowDatePickerDataInicio(!showDatePickerDataInicio);
   };
 
   async function shareExcel() {
@@ -319,7 +322,7 @@ export default function RelatoriosScreen(props: any) {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {mostrarListaRestaurantes == true && (
         <View
           style={[
@@ -472,6 +475,6 @@ export default function RelatoriosScreen(props: any) {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
