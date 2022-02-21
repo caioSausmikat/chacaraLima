@@ -47,7 +47,8 @@ app.post("/login", async (req, res) => {
   if (result == false) {
     res.send(JSON.stringify("erro"));
   } else {
-    res.send({usuario: response.usuario, senha: plaintextPassword});
+    response.senha = plaintextPassword;
+    res.send(response);
   }
 });
 
@@ -488,9 +489,12 @@ app.post("/redefinirSenha", async (req, res) => {
     .catch((err) => {
       console.log(err);
     });
-    const plaintextPassword = req.body.senhaAtual;
-    const result = bcrypt.compareSync(plaintextPassword, verificaSenhaAtualResponse.senha);
-    if (result == false) {
+  const plaintextPassword = req.body.senhaAtual;
+  const result = bcrypt.compareSync(
+    plaintextPassword,
+    verificaSenhaAtualResponse.senha
+  );
+  if (result == false) {
     res.send(false);
   } else {
     let response = await usuarios
