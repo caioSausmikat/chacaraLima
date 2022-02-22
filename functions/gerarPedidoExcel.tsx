@@ -14,7 +14,8 @@ export default async function gerarPedidoExcel(
   nomeRestauranteSelecionado: string
 ): Promise<string> {
   const now = new Date();
-  const fileName = `${nomeRestauranteSelecionado} - ${dataBr(
+  let nomeRestauranteSemEspaco = nomeRestauranteSelecionado.replace(/\s/g, "_");
+  const fileName = `${nomeRestauranteSemEspaco}_${dataBr(
     pedido[0].dataPedido,
     "-"
   )}.xlsx`;

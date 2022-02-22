@@ -50,6 +50,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       CriarSenha: "CriarSenha",
       AlterarRestaurantes: "AlterarRestaurantes",
       EditarUsuario: "EditarUsuario",
+      TotalProdutosPedidos: "TotalProdutosPedidos",
     },
   },
 };

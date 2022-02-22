@@ -674,6 +674,20 @@ app.post("/geraRecibosPedidosData", async (req, res) => {
   }
 });
 
+//Busca total de produtos pedidos em uma data
+app.post("/buscaTotalProdutos", async (req, res) => {
+  const response = await sequelize.query(
+    `SELECT A.produtoId, B.nome, SUM(A.quantidadeProduto) AS quantidadeProduto FROM pedidos A, produtos B WHERE A.dataPedido = '${dataPedido}' AND A.produtoId = B.id GROUP BY A.produtoId ORDER BY B.nome`,
+    { raw: true }
+  );
+
+  let totalProtudosResponse = [];
+  for (const item of response[0]) {
+    totalProtudosResponse.push(item);
+  }
+  res.send(JSON.stringify(totalProtudosResponse));
+});
+
 //Busca tokens de usuarios do tipo 1 e 2
 app.post("/buscaTokensResponsaveis", async (req, res) => {
   const response = await sequelize.query(

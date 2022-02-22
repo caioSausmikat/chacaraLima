@@ -22,6 +22,7 @@ export type RootStackParamList = {
   Cliente: undefined;
   Login: undefined;
   AlterarRestaurantes: undefined;
+  TotalProdutosPedidos: undefined;
   EditarUsuario: undefined;
   RedefinirSenha: undefined;
   RedefinirPropriaSenha: undefined;

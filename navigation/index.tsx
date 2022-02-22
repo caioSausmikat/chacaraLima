@@ -20,6 +20,7 @@ import PedidosScreen from "../screens/administrador/pedidos/PedidosScreen";
 import RestaurantesScreen from "../screens/administrador/restaurantes/RestaurantesScreen";
 import ProdutosScreen from "../screens/administrador/produtos/ProdutosScreen";
 import AlterarRestaurantesScreen from "../screens/administrador/restaurantes/AlterarRestaurantesScreen";
+import TotalProdutosPedidos from "../screens/administrador/totalProdutosPedidos/TotalProdutosPedidosScreen";
 import UsuariosScreen from "../screens/administrador/usuarios/UsuariosScreen";
 import RelatoriosScreen from "../screens/administrador/relatorios/RelatoriosScreen";
 import EditarUsuarioScreen from "../screens/administrador/usuarios/EditarUsuarioScreen";
@@ -128,6 +129,14 @@ function RootNavigator() {
           headerTitle: "Clientes",
         }}
       />
+      <Stack.Screen
+        name="TotalProdutosPedidos"
+        component={TotalProdutosPedidos}
+        options={{
+          headerShown: true,
+          headerTitle: "Total de Produtos",
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -153,7 +162,7 @@ function BottomTabNavigator({ route }) {
           name="Pedidos"
           component={PedidosScreen}
           initialParams={{ usuarioLogado: route.params.usuario }}
-          options={{
+          options={({ navigation }: any) => ({
             headerTitle: "",
             headerTransparent: true,
             tabBarIcon: ({ focused, color, size }) => {
@@ -164,7 +173,37 @@ function BottomTabNavigator({ route }) {
               // You can return any component that you like here!
               return <Ionicons name={iconName} size={size} color={color} />;
             },
-          }}
+            headerRight: () => (
+              <Pressable
+                onPress={() => navigation.navigate("TotalProdutosPedidos")}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.5 : 1,
+                })}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#4b9666",
+                    marginRight: 20,
+                    marginBottom: 15,
+                    borderRadius: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      padding: 5,
+                    }}
+                  >
+                    Total de Produtos
+                  </Text>
+                </View>
+              </Pressable>
+            ),
+          })}
         />
       )}
       {route.params.usuario.tiposUsuariosId === 1 && (

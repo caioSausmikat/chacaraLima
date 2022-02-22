@@ -13,7 +13,7 @@ export default async function gerarPedidoExcel(
   dataPedido: string
 ): Promise<string> {
   const now = new Date();
-  const fileName = `Todos os pedidos - ${dataPedido}.xlsx`;
+  const fileName = `Todos_os_pedidos_${dataPedido}.xlsx`;
   const fileUri = FileSystem.cacheDirectory + fileName;
 
   return new Promise<string>((resolve, reject) => {

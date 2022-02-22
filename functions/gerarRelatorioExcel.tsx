@@ -17,10 +17,11 @@ export default async function gerarRelatorioExcel(
   dataFim: string
 ): Promise<string> {
   const now = new Date();
-  const fileName = `${nomeRestauranteSelecionado} - ${dataBr(
+  let nomeRestauranteSemEspaco = nomeRestauranteSelecionado.replace(/\s/g, "_");
+  const fileName = `${nomeRestauranteSemEspaco}_${dataBr(
     dataInicio,
     "-"
-  )} a ${dataBr(dataFim, "-")}.xlsx`;
+  )}_a_${dataBr(dataFim, "-")}.xlsx`;
   const fileUri = FileSystem.cacheDirectory + fileName;
 
   return new Promise<string>((resolve, reject) => {
