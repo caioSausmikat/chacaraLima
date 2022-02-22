@@ -7,10 +7,10 @@ export default function TotalProdutosPedidosItemScreen(props: any) {
     <View
       style={[
         styles.listaProdutosRestauranteContainer,
-        { width: "92%", alignSelf: "center" },
+        { width: "92%", alignSelf: "center", justifyContent: "center" },
       ]}
     >
-      <View style={[styles.produtosRestauranteContainer, { width: "45%" }]}>
+      <View style={[styles.produtosRestauranteContainer, { width: "60%" }]}>
         <Text>{props.itemProduto.nome}</Text>
       </View>
       <View

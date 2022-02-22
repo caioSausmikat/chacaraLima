@@ -20,6 +20,8 @@ export default function TotalProdutosPedidosScreen(props: any) {
     ProdutoPedidos[]
   >([]);
 
+  const [atualizaFlatList, setAtualizaFlatList] = useState(false);
+
   useEffect(() => {
     buscarDadosIniciais();
   }, []);
@@ -65,32 +67,21 @@ export default function TotalProdutosPedidosScreen(props: any) {
         quantidadeProduto: item.quantidadeProduto.toString(),
       });
     }
+    setAtualizaFlatList(!atualizaFlatList);
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={[
-          Platform.OS === "ios"
-            ? {
-                zIndex: 3000,
-                flexDirection: "row",
-                marginTop: 40,
-                marginLeft: 15,
-              }
-            : { flexDirection: "row", marginTop: 40, marginLeft: 15 },
-        ]}
-      >
-        {listaProdutosPedidos.length > 0 && (
-          <FlatList
-            data={listaProdutosPedidos}
-            removeClippedSubviews={false}
-            renderItem={(itemData) => (
-              <TotalProdutosPedidosItemScreen itemProduto={itemData.item} />
-            )}
-          />
-        )}
-      </View>
+      {listaProdutosPedidos.length > 0 && (
+        <FlatList
+          data={listaProdutosPedidos}
+          extraData={atualizaFlatList}
+          removeClippedSubviews={false}
+          renderItem={(itemData) => (
+            <TotalProdutosPedidosItemScreen itemProduto={itemData.item} />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
