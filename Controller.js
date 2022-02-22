@@ -677,7 +677,7 @@ app.post("/geraRecibosPedidosData", async (req, res) => {
 //Busca total de produtos pedidos em uma data
 app.post("/buscaTotalProdutos", async (req, res) => {
   const response = await sequelize.query(
-    `SELECT A.produtoId, B.nome, SUM(A.quantidadeProduto) AS quantidadeProduto FROM pedidos A, produtos B WHERE A.dataPedido = '${dataPedido}' AND A.produtoId = B.id GROUP BY A.produtoId ORDER BY B.nome`,
+    `SELECT A.produtoId, B.nome, SUM(A.quantidadeProduto) AS quantidadeProduto FROM pedidos A, produtos B WHERE A.dataPedido = '${req.body.dataPedido}' AND A.produtoId = B.id GROUP BY A.produtoId ORDER BY B.nome`,
     { raw: true }
   );
 
