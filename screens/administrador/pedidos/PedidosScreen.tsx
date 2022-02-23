@@ -330,7 +330,6 @@ export default function PedidosScreen(props: any) {
   }
 
   async function salvarPedido() {
-    console.log(pedido);
     let response = await fetch(config.urlRoot + "salvarPedido", {
       method: "POST",
       headers: {

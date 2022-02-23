@@ -612,7 +612,6 @@ export default function UsuarioScreen(props: any) {
 
           {dataPedido ===
             moment().subtract(3, "hour").add(1, "days").toJSON().slice(0, 10) &&
-            pedidoDataRestaurante == true &&
             todosPedidos == false && (
               <TouchableOpacity
                 style={styles.buscaPedidoButton}
