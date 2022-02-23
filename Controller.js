@@ -618,6 +618,8 @@ app.post("/salvarPedido", async (req, res) => {
     if (quantidadeInclusoes > 0) {
       res.send(true);
     }
+  } else {
+    res.send(true);
   }
 });
 
