@@ -591,20 +591,18 @@ export default function PedidosScreen(props: any) {
               </TouchableOpacity>
             )}
 
-          {pedido.length > 0 &&
-            pedidoDataRestaurante == true &&
-            todosPedidos == false && (
-              <TouchableOpacity
-                style={styles.buscaPedidoButton}
-                onPress={() => {
-                  salvarPedido();
-                }}
-              >
-                <Text style={styles.confirmaRedefinicaoSenhaText}>
-                  Salvar Pedido
-                </Text>
-              </TouchableOpacity>
-            )}
+          {pedido.length > 0 && todosPedidos == false && (
+            <TouchableOpacity
+              style={styles.buscaPedidoButton}
+              onPress={() => {
+                salvarPedido();
+              }}
+            >
+              <Text style={styles.confirmaRedefinicaoSenhaText}>
+                Salvar Pedido
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
       {todosPedidos == true && (

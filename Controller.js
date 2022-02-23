@@ -580,18 +580,18 @@ app.post("/detalhaPedido", async (req, res) => {
 
 //Salva pedido
 app.post("/salvarPedido", async (req, res) => {
-  if (req.body.pedido.length > 0) {
-    await pedidos
-      .destroy({
-        where: {
-          dataPedido: req.body.pedido[0].dataPedido,
-          restauranteId: req.body.pedido[0].restauranteId,
-        },
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  await pedidos
+    .destroy({
+      where: {
+        dataPedido: req.body.pedido[0].dataPedido,
+        restauranteId: req.body.pedido[0].restauranteId,
+      },
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
+  if (req.body.pedido.length > 0) {
     let quantidadeInclusoes = 0;
     for (const produto of req.body.pedido) {
       if (produto.quantidadeProduto > 0) {
