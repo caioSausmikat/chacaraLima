@@ -591,36 +591,31 @@ app.post("/salvarPedido", async (req, res) => {
       console.log(err);
     });
 
-  if (req.body.pedido.length > 0) {
-    let quantidadeInclusoes = 0;
-    for (const produto of req.body.pedido) {
-      if (produto.quantidadeProduto > 0) {
-        const incluirResponse = await pedidos
-          .create({
-            dataPedido: produto.dataPedido,
-            restauranteId: produto.restauranteId,
-            usuarioId: produto.usuarioId,
-            nomeUsuario: produto.nomeUsuario,
-            produtoId: produto.produtoId,
-            quantidadeProduto: produto.quantidadeProduto,
-            valorProduto: produto.valorProduto,
-            createdAt: Date(),
-            updatedAt: Date(),
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-        if (incluirResponse) {
-          quantidadeInclusoes++;
-        }
+  let quantidadeInclusoes = 0;
+  for (const produto of req.body.pedido) {
+    if (produto.quantidadeProduto > 0) {
+      const incluirResponse = await pedidos
+        .create({
+          dataPedido: produto.dataPedido,
+          restauranteId: produto.restauranteId,
+          usuarioId: produto.usuarioId,
+          nomeUsuario: produto.nomeUsuario,
+          produtoId: produto.produtoId,
+          quantidadeProduto: produto.quantidadeProduto,
+          valorProduto: produto.valorProduto,
+          createdAt: Date(),
+          updatedAt: Date(),
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      if (incluirResponse) {
+        quantidadeInclusoes++;
       }
     }
-    if (quantidadeInclusoes > 0) {
-      res.send(true);
-    }
-  } else {
-    res.send(true);
   }
+
+  res.send(true);
 });
 
 //Busca dados de restaurante

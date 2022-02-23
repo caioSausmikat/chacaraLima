@@ -330,6 +330,7 @@ export default function PedidosScreen(props: any) {
   }
 
   async function salvarPedido() {
+    console.log(pedido);
     let response = await fetch(config.urlRoot + "salvarPedido", {
       method: "POST",
       headers: {
@@ -341,6 +342,7 @@ export default function PedidosScreen(props: any) {
       }),
     });
     let salvoSucesso = await response.json();
+    console.log(salvoSucesso);
     if (salvoSucesso) {
       atualizaProdutosRestaurante(codigoRestauranteSelecionado);
       Keyboard.dismiss();
